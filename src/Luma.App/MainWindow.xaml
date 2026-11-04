@@ -25,8 +25,8 @@
             <TextBlock Grid.Column="2" Text="FOUNDATION PREVIEW" Foreground="#858A9B" FontSize="10" CharacterSpacing="120" VerticalAlignment="Center"/>
         </Grid>
         <Grid x:Name="WorkspaceRoot" Grid.Row="1" Padding="28,24">
-            <Image x:Name="WorkspaceWallpaper" Stretch="UniformToFill" Opacity="0.32" IsHitTestVisible="False"/>
             <Grid.ColumnDefinitions><ColumnDefinition Width="210"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+            <Image x:Name="WorkspaceWallpaper" Grid.ColumnSpan="2" Stretch="UniformToFill" Opacity="0.32" IsHitTestVisible="False"/>
             <Border Grid.Column="0" Background="#191B24" CornerRadius="22" Padding="12">
                 <StackPanel Spacing="8">
                     <TextBlock Text="WORKSPACE" Foreground="#74798B" FontSize="10" CharacterSpacing="130" Margin="10,8,0,10"/>
