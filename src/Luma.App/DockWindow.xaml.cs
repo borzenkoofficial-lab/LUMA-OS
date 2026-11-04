@@ -74,11 +74,12 @@ public sealed partial class DockWindow : Window
         var appWindow = AppWindow.GetFromWindowId(windowId);
         var workArea = DisplayArea.GetFromWindowId(windowId, DisplayAreaFallback.Primary).WorkArea;
 
-        const int height = 86;
+        const int height = 100;
         var maximumWidth = Math.Max(300, workArea.Width - 32);
-        var width = Math.Min(maximumWidth, Math.Max(300, 190 + _items.Count * 72));
+        var preferredWidth = 210 + _items.Count * 82;
+        var width = Math.Min(maximumWidth, Math.Max(300, preferredWidth));
         var x = workArea.X + Math.Max(0, (workArea.Width - width) / 2);
-        var y = workArea.Y + Math.Max(0, workArea.Height - height - 12);
+        var y = workArea.Y + Math.Max(0, workArea.Height - height - 14);
         appWindow.MoveAndResize(new RectInt32(x, y, width, height));
     }
 
