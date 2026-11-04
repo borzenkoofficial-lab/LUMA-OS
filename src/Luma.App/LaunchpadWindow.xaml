@@ -40,9 +40,14 @@
                             <Border Width="68" Height="68" CornerRadius="20"
                                     Background="#343D52" BorderBrush="#45FFFFFF" BorderThickness="1"
                                     HorizontalAlignment="Center">
-                                <TextBlock Text="{Binding Initial}" Foreground="#F7F8FC"
-                                           FontSize="29" FontWeight="Medium"
-                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <Grid>
+                                    <TextBlock Text="{Binding Initial}" Foreground="#F7F8FC"
+                                               FontSize="29" FontWeight="Medium"
+                                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    <Image Source="{Binding Icon}" Width="62" Height="62"
+                                           Stretch="Uniform" HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"/>
+                                </Grid>
                             </Border>
                             <TextBlock Text="{Binding Name}" Foreground="#E9ECF4" FontSize="11"
                                        MaxWidth="108" TextTrimming="CharacterEllipsis"
