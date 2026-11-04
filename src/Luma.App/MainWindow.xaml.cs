@@ -188,6 +188,7 @@ public sealed partial class MainWindow : Window
 
         _pinnedApps.Add(app);
         PersistDock();
+        (Application.Current as App)?.RefreshDock();
         AppsStatusText.Text = $"{app.Name} pinned to Dock.";
     }
 
