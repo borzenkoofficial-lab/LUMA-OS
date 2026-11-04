@@ -19,6 +19,7 @@ public sealed partial class MainWindow : Window
     private readonly FileBrowserService _fileBrowser = new();
     private readonly FileBrowserPathState _fileBrowserPath = new();
     private readonly DockService _dockService = new();
+    private readonly WindowsAppearanceService _windowsAppearance = new();
     private readonly DesktopPreferencesService _desktopPreferences = new();
     private readonly DesktopLayoutService _desktopLayoutService = new();
     private readonly DesktopIconLayoutState _desktopLayout = new();
@@ -248,6 +249,40 @@ public sealed partial class MainWindow : Window
         catch (Exception ex)
         {
             WallpaperStatusText.Text = $"Saved wallpaper could not be displayed: {ex.Message}";
+        }
+    }
+
+    private void ApplyWindowsAppearance_Click(object sender, RoutedEventArgs e)
+    {
+        var wallpaperPath = _desktopPreferences.LoadWallpaperPath();
+        if (string.IsNullOrWhiteSpace(wallpaperPath))
+        {
+            WindowsAppearanceStatus.Text = "Choose a wallpaper before applying the LUMA appearance.";
+            return;
+        }
+
+        try
+        {
+            _windowsAppearance.Apply(wallpaperPath);
+            WindowsAppearanceStatus.Text = "LUMA appearance applied to Windows. Your original settings are backed up.";
+        }
+        catch (Exception ex)
+        {
+            WindowsAppearanceStatus.Text = $"Could not apply Windows appearance: {ex.Message}";
+        }
+    }
+
+    private void RestoreWindowsAppearance_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            WindowsAppearanceStatus.Text = _windowsAppearance.Restore()
+                ? "Previous Windows appearance restored where settings still matched LUMA changes."
+                : "No LUMA appearance backup was found.";
+        }
+        catch (Exception ex)
+        {
+            WindowsAppearanceStatus.Text = $"Could not restore Windows appearance: {ex.Message}";
         }
     }
 
