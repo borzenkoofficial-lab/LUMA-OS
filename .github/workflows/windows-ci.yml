@@ -13,6 +13,7 @@ concurrency:
 
 permissions:
   contents: read
+  actions: read
 
 jobs:
   build-and-test:
@@ -30,10 +31,22 @@ jobs:
         run: dotnet build LUMA.sln --configuration Release --no-restore
       - name: Test core
         run: dotnet test tests/Luma.Core.Tests/Luma.Core.Tests.csproj --configuration Release --no-restore
-      - name: Upload LUMA preview build
+      - name: Package Windows preview
+        shell: pwsh
+        run: |
+          $output = "src/Luma.App/bin/Release/net10.0-windows10.0.19041.0"
+          if (!(Test-Path "$output/Luma.App.exe")) {
+            Get-ChildItem -Path $output -Force | Select-Object Name, Length | Format-Table -AutoSize
+            throw "Luma.App.exe was not found in the build output."
+          }
+          $archive = "LUMA-OS-preview-${{ github.sha }}.zip"
+          Compress-Archive -Path "$output/*" -DestinationPath $archive -CompressionLevel Optimal
+          Get-Item $archive | Select-Object Name, Length | Format-Table -AutoSize
+      - name: Upload Windows preview ZIP
         uses: actions/upload-artifact@v4
         with:
-          name: LUMA-OS-preview-${{ github.sha }}
-          path: src/Luma.App/bin/Release/net10.0-windows10.0.19041.0/
+          name: LUMA-OS-Windows-Preview
+          path: LUMA-OS-preview-${{ github.sha }}.zip
           if-no-files-found: error
-          retention-days: 14
+          retention-days: 30
+          compression-level: 0
