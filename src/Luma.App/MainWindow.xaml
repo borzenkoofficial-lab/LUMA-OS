@@ -74,14 +74,22 @@
                                     </ListView.ItemsPanel>
                                     <ListView.ItemTemplate>
                                         <DataTemplate>
-                                            <Button Content="{Binding Name}" Tag="{Binding ShortcutPath}" Click="DesktopShortcut_Click" Width="150" Height="64" Margin="4">
-                                                <Button.ContextFlyout>
-                                                    <MenuFlyout>
-                                                        <MenuFlyoutItem Text="Open" Tag="{Binding ShortcutPath}" Click="DesktopShortcutMenuOpen_Click"/>
-                                                        <MenuFlyoutItem Text="Show in File Explorer" Tag="{Binding ShortcutPath}" Click="DesktopShortcutReveal_Click"/>
-                                                    </MenuFlyout>
-                                                </Button.ContextFlyout>
-                                            </Button>
+                                            <StackPanel Width="164" Margin="4" Spacing="4">
+                                                <Button Content="{Binding Name}" Tag="{Binding ShortcutPath}" Click="DesktopShortcut_Click" Height="58">
+                                                    <Button.ContextFlyout>
+                                                        <MenuFlyout>
+                                                            <MenuFlyoutItem Text="Open" Tag="{Binding ShortcutPath}" Click="DesktopShortcutMenuOpen_Click"/>
+                                                            <MenuFlyoutItem Text="Show in File Explorer" Tag="{Binding ShortcutPath}" Click="DesktopShortcutReveal_Click"/>
+                                                            <MenuFlyoutItem Text="Move left / up" Tag="{Binding ShortcutPath}" Click="DesktopShortcutMoveUp_Click"/>
+                                                            <MenuFlyoutItem Text="Move right / down" Tag="{Binding ShortcutPath}" Click="DesktopShortcutMoveDown_Click"/>
+                                                        </MenuFlyout>
+                                                    </Button.ContextFlyout>
+                                                </Button>
+                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="6">
+                                                    <Button Content="↑" Tag="{Binding ShortcutPath}" Click="DesktopShortcutMoveUp_Click" MinWidth="54"/>
+                                                    <Button Content="↓" Tag="{Binding ShortcutPath}" Click="DesktopShortcutMoveDown_Click" MinWidth="54"/>
+                                                </StackPanel>
+                                            </StackPanel>
                                         </DataTemplate>
                                     </ListView.ItemTemplate>
                                 </ListView>
