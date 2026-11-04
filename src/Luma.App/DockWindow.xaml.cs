@@ -1,10 +1,13 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Numerics;
 using Luma.App.Services;
 using Microsoft.UI;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Hosting;
+using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Windows.Graphics;
 
@@ -81,6 +84,32 @@ public sealed partial class DockWindow : Window
         var x = workArea.X + Math.Max(0, (workArea.Width - width) / 2);
         var y = workArea.Y + Math.Max(0, workArea.Height - height - 14);
         appWindow.MoveAndResize(new RectInt32(x, y, width, height));
+    }
+
+    private void DockButton_PointerEntered(object sender, PointerRoutedEventArgs e)
+    {
+        if (sender is FrameworkElement element)
+            AnimateButtonScale(element, 1.14f);
+    }
+
+    private void DockButton_PointerExited(object sender, PointerRoutedEventArgs e)
+    {
+        if (sender is FrameworkElement element)
+            AnimateButtonScale(element, 1f);
+    }
+
+    private static void AnimateButtonScale(FrameworkElement element, float scale)
+    {
+        var visual = ElementCompositionPreview.GetElementVisual(element);
+        visual.CenterPoint = new Vector3(
+            (float)(element.ActualWidth / 2),
+            (float)(element.ActualHeight / 2),
+            0);
+
+        var animation = visual.Compositor.CreateVector3KeyFrameAnimation();
+        animation.InsertKeyFrame(1f, new Vector3(scale, scale, 1f));
+        animation.Duration = TimeSpan.FromMilliseconds(170);
+        visual.StartAnimation("Scale", animation);
     }
 
     private void LumaButton_Click(object sender, RoutedEventArgs e) => _openDashboard();
