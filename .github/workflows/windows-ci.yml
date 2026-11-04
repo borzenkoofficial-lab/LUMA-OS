@@ -51,13 +51,22 @@ jobs:
       - name: Publish self-contained Windows x64 app
         shell: pwsh
         run: |
-          dotnet publish src/Luma.App/Luma.App.csproj --configuration Release --runtime win-x64 --self-contained true --output publish/win-x64 -p:WindowsAppSDKSelfContained=true -p:WindowsPackageType=None -p:PublishSingleFile=false
+          dotnet publish src/Luma.App/Luma.App.csproj --configuration Release --runtime win-x64 --self-contained true --output publish/win-x64 -p:WindowsAppSDKSelfContained=true -p:WindowsPackageType=None -p:EnableMsixTooling=true -p:PublishTrimmed=false -p:IsTrimmable=false -p:PublishSingleFile=false
           if (!(Test-Path "publish/win-x64/Luma.App.exe")) {
             Get-ChildItem "publish/win-x64" -Force | Select-Object Name, Length | Format-Table -AutoSize
             throw "Self-contained publish did not produce Luma.App.exe."
           }
           if (!(Get-ChildItem "publish/win-x64" -Filter "*.dll" | Measure-Object).Count) {
             throw "Publish output is missing application/runtime DLLs."
+          }
+          foreach ($required in @("Microsoft.UI.Xaml.dll", "Microsoft.WindowsAppRuntime.dll", "Luma.App.dll")) {
+            if (!(Test-Path (Join-Path "publish/win-x64" $required))) {
+              throw "Self-contained publish is missing required file: $required"
+            }
+          }
+          if (Test-Path "publish/win-x64/Luma.App.runtimeconfig.json") {
+            $runtimeConfig = Get-Content "publish/win-x64/Luma.App.runtimeconfig.json" -Raw | ConvertFrom-Json
+            if (!$runtimeConfig.runtimeOptions) { throw "Published runtimeconfig is invalid." }
           }
 
       - name: Install Inno Setup
