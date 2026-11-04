@@ -21,16 +21,21 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Setup .NET 10
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 10.0.x
+
       - name: Restore
         run: dotnet restore LUMA.sln
+
       - name: Build
         run: dotnet build LUMA.sln --configuration Release --no-restore
+
       - name: Test core
         run: dotnet test tests/Luma.Core.Tests/Luma.Core.Tests.csproj --configuration Release --no-restore
+
       - name: Package Windows preview
         shell: pwsh
         run: |
@@ -42,11 +47,60 @@ jobs:
           $archive = "LUMA-OS-preview-${{ github.sha }}.zip"
           Compress-Archive -Path "$output/*" -DestinationPath $archive -CompressionLevel Optimal
           Get-Item $archive | Select-Object Name, Length | Format-Table -AutoSize
+
+      - name: Publish self-contained Windows x64 app
+        shell: pwsh
+        run: |
+          dotnet publish src/Luma.App/Luma.App.csproj --configuration Release --runtime win-x64 --self-contained true --output publish/win-x64 -p:WindowsAppSDKSelfContained=true -p:WindowsPackageType=None -p:PublishSingleFile=false
+          if (!(Test-Path "publish/win-x64/Luma.App.exe")) {
+            Get-ChildItem "publish/win-x64" -Force | Select-Object Name, Length | Format-Table -AutoSize
+            throw "Self-contained publish did not produce Luma.App.exe."
+          }
+          if (!(Get-ChildItem "publish/win-x64" -Filter "*.dll" | Measure-Object).Count) {
+            throw "Publish output is missing application/runtime DLLs."
+          }
+
+      - name: Install Inno Setup
+        shell: pwsh
+        run: |
+          choco install innosetup --no-progress -y
+          $compiler = "${env:ProgramFiles(x86)}Inno Setup 6ISCC.exe"
+          if (!(Test-Path $compiler)) {
+            throw "Inno Setup compiler was not found at $compiler."
+          }
+
+      - name: Compile per-user installer
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path artifacts | Out-Null
+          $compiler = "${env:ProgramFiles(x86)}Inno Setup 6ISCC.exe"
+          $publishDir = (Resolve-Path "publish/win-x64").Path
+          & $compiler "/DPublishDir=$publishDir" "installer/LUMA-OS.iss"
+          if ($LASTEXITCODE -ne 0) {
+            throw "Inno Setup failed with exit code $LASTEXITCODE."
+          }
+          $installer = "artifacts/LUMA-OS-Setup.exe"
+          if (!(Test-Path $installer)) {
+            throw "Installer executable was not created."
+          }
+          $versioned = "artifacts/LUMA-OS-Setup-${{ github.sha }}.exe"
+          Move-Item $installer $versioned -Force
+          Get-Item $versioned | Select-Object Name, Length | Format-Table -AutoSize
+
       - name: Upload Windows preview ZIP
         uses: actions/upload-artifact@v4
         with:
           name: LUMA-OS-Windows-Preview
           path: LUMA-OS-preview-${{ github.sha }}.zip
+          if-no-files-found: error
+          retention-days: 30
+          compression-level: 0
+
+      - name: Upload Windows installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: LUMA-OS-Windows-Installer
+          path: artifacts/LUMA-OS-Setup-${{ github.sha }}.exe
           if-no-files-found: error
           retention-days: 30
           compression-level: 0
