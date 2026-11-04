@@ -12,18 +12,21 @@ public sealed partial class MenuBarWindow : Window
     private readonly Action _openLaunchpad;
     private readonly Action _openSpotlight;
     private readonly Action _openControlCenter;
+    private readonly Action _openFileManager;
     private readonly DispatcherQueueTimer _clockTimer;
 
     public MenuBarWindow(
         Action openDashboard,
         Action openLaunchpad,
         Action openSpotlight,
-        Action openControlCenter)
+        Action openControlCenter,
+        Action openFileManager)
     {
         _openDashboard = openDashboard;
         _openLaunchpad = openLaunchpad;
         _openSpotlight = openSpotlight;
         _openControlCenter = openControlCenter;
+        _openFileManager = openFileManager;
 
         InitializeComponent();
         ConfigureWindow();
@@ -68,4 +71,5 @@ public sealed partial class MenuBarWindow : Window
     private void Launchpad_Click(object sender, RoutedEventArgs e) => _openLaunchpad();
     private void Spotlight_Click(object sender, RoutedEventArgs e) => _openSpotlight();
     private void ControlCenter_Click(object sender, RoutedEventArgs e) => _openControlCenter();
+    private void Files_Click(object sender, RoutedEventArgs e) => _openFileManager();
 }
