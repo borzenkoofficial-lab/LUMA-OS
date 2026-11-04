@@ -123,7 +123,7 @@
                                     <ListView.ItemTemplate>
                                         <DataTemplate>
                                             <Grid Padding="10" ColumnSpacing="10">
-                                                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                                                 <StackPanel Spacing="3" VerticalAlignment="Center">
                                                     <TextBlock Text="{Binding Title}" Foreground="#F5F6FA" FontSize="13" TextTrimming="CharacterEllipsis"/>
                                                     <TextBlock Text="{Binding ProcessName}" Foreground="#858A9B" FontSize="10"/>
@@ -131,6 +131,9 @@
                                                 <Button Grid.Column="1" Content="Focus" Tag="{Binding Handle}" Click="ActivateWindow_Click"/>
                                                 <Button Grid.Column="2" Content="Minimize" Tag="{Binding Handle}" Click="MinimizeWindow_Click"/>
                                                 <Button Grid.Column="3" Content="Close" Tag="{Binding Handle}" Click="CloseWindow_Click"/>
+                                                <Button Grid.Column="4" Content="Left" Tag="{Binding Handle}" Click="SnapWindowLeft_Click"/>
+                                                <Button Grid.Column="5" Content="Right" Tag="{Binding Handle}" Click="SnapWindowRight_Click"/>
+                                                <Button Grid.Column="6" Content="Max" Tag="{Binding Handle}" Click="MaximizeWindow_Click"/>
                                             </Grid>
                                         </DataTemplate>
                                     </ListView.ItemTemplate>

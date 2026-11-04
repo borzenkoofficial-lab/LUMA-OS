@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
+using Luma.Core.Windows;
 
 namespace Luma.App.Services;
 
@@ -10,7 +11,11 @@ public sealed class WindowManagerService
 {
     private const int SwRestore = 9;
     private const int SwMinimize = 6;
+    private const int SwMaximize = 3;
     private const uint WmClose = 0x0010;
+    private const uint MonitorDefaultToNearest = 2;
+    private const uint SwpNoZOrder = 0x0004;
+    private const uint SwpNoActivate = 0x0010;
 
     public IReadOnlyList<ManagedWindow> DiscoverWindows(IntPtr excludedWindow)
     {
@@ -67,6 +72,48 @@ public sealed class WindowManagerService
         return IsWindow(window);
     }
 
+    public bool Maximize(long handle)
+    {
+        var window = new IntPtr(handle);
+        if (!IsWindow(window))
+            return false;
+
+        ShowWindow(window, SwMaximize);
+        return IsWindow(window);
+    }
+
+    public bool Snap(long handle, WindowSnapZone zone)
+    {
+        var window = new IntPtr(handle);
+        if (!IsWindow(window))
+            return false;
+
+        var monitor = MonitorFromWindow(window, MonitorDefaultToNearest);
+        if (monitor == IntPtr.Zero)
+            return false;
+
+        var monitorInfo = new MonitorInfo { Size = Marshal.SizeOf<MonitorInfo>() };
+        if (!GetMonitorInfo(monitor, ref monitorInfo))
+            return false;
+
+        var workArea = new WorkArea(
+            monitorInfo.Work.Left,
+            monitorInfo.Work.Top,
+            monitorInfo.Work.Right - monitorInfo.Work.Left,
+            monitorInfo.Work.Bottom - monitorInfo.Work.Top);
+        var bounds = WindowSnapLayout.Calculate(workArea, zone);
+
+        ShowWindow(window, SwRestore);
+        return SetWindowPos(
+            window,
+            IntPtr.Zero,
+            bounds.Left,
+            bounds.Top,
+            bounds.Width,
+            bounds.Height,
+            SwpNoZOrder | SwpNoActivate);
+    }
+
     public bool RequestClose(long handle)
     {
         var window = new IntPtr(handle);
@@ -84,6 +131,24 @@ public sealed class WindowManagerService
         catch (InvalidOperationException) { return "Unknown process"; }
         catch (System.ComponentModel.Win32Exception) { return "Protected process"; }
         catch (OverflowException) { return "Unknown process"; }
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct NativeRect
+    {
+        public int Left;
+        public int Top;
+        public int Right;
+        public int Bottom;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct MonitorInfo
+    {
+        public int Size;
+        public NativeRect Monitor;
+        public NativeRect Work;
+        public uint Flags;
     }
 
     private delegate bool EnumWindowsCallback(IntPtr window, IntPtr parameter);
@@ -121,7 +186,18 @@ public sealed class WindowManagerService
     [return: MarshalAs(UnmanagedType.Bool)]
     private static extern bool SetForegroundWindow(IntPtr window);
 
-    [DllImport("user32.dll", SetLastError = true)]
+    [DllImport("user32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]
     private static extern bool PostMessage(IntPtr window, uint message, IntPtr wParam, IntPtr lParam);
+
+    [DllImport("user32.dll")]
+    private static extern IntPtr MonitorFromWindow(IntPtr window, uint flags);
+
+    [DllImport("user32.dll", CharSet = CharSet.Auto)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool GetMonitorInfo(IntPtr monitor, ref MonitorInfo monitorInfo);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool SetWindowPos(IntPtr window, IntPtr insertAfter, int x, int y, int width, int height, uint flags);
 }
