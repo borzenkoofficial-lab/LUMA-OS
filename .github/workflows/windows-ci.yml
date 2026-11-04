@@ -28,10 +28,10 @@ jobs:
           dotnet-version: 10.0.x
 
       - name: Restore
-        run: dotnet restore LUMA.sln
+        run: dotnet restore LUMA.sln --runtime win-x64
 
       - name: Build
-        run: dotnet build LUMA.sln --configuration Release --no-restore
+        run: dotnet build LUMA.sln --configuration Release --no-restore --runtime win-x64
 
       - name: Test core
         run: dotnet test tests/Luma.Core.Tests/Luma.Core.Tests.csproj --configuration Release --no-restore
@@ -39,7 +39,7 @@ jobs:
       - name: Package Windows preview
         shell: pwsh
         run: |
-          $output = "src/Luma.App/bin/Release/net10.0-windows10.0.19041.0"
+          $output = "src/Luma.App/bin/Release/net10.0-windows10.0.19041.0/win-x64"
           if (!(Test-Path "$output/Luma.App.exe")) {
             Get-ChildItem -Path $output -Force | Select-Object Name, Length | Format-Table -AutoSize
             throw "Luma.App.exe was not found in the build output."
