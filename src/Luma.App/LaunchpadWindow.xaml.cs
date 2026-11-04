@@ -1,10 +1,12 @@
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using Luma.App.Services;
 using Microsoft.UI;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media;
 using Windows.Graphics;
 
 namespace Luma.App;
@@ -62,12 +64,19 @@ public sealed partial class LaunchpadWindow : Window
             var initial = string.IsNullOrWhiteSpace(app.Name)
                 ? "•"
                 : app.Name.Trim()[0].ToString().ToUpperInvariant();
-            _visibleApps.Add(new LaunchpadItem(app.Name, app.ShortcutPath, initial));
+            var item = new LaunchpadItem(app.Name, app.ShortcutPath, initial);
+            _visibleApps.Add(item);
+            _ = LoadIconAsync(item);
         }
 
         StatusText.Text = _allApps.Count == 0
             ? "No Start Menu shortcuts were found."
             : $"{_visibleApps.Count} applications";
+    }
+
+    private static async Task LoadIconAsync(LaunchpadItem item)
+    {
+        item.Icon = await ShellIconService.LoadShortcutIconAsync(item.ShortcutPath);
     }
 
     private void SearchBox_TextChanged(object sender, TextChangedEventArgs e) => ApplyFilter();
@@ -97,5 +106,33 @@ public sealed partial class LaunchpadWindow : Window
 
     private void CloseButton_Click(object sender, RoutedEventArgs e) => Close();
 
-    private sealed record LaunchpadItem(string Name, string ShortcutPath, string Initial);
+    private sealed class LaunchpadItem : INotifyPropertyChanged
+    {
+        private ImageSource? _icon;
+
+        public LaunchpadItem(string name, string shortcutPath, string initial)
+        {
+            Name = name;
+            ShortcutPath = shortcutPath;
+            Initial = initial;
+        }
+
+        public string Name { get; }
+        public string ShortcutPath { get; }
+        public string Initial { get; }
+
+        public ImageSource? Icon
+        {
+            get => _icon;
+            set
+            {
+                if (ReferenceEquals(_icon, value))
+                    return;
+                _icon = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Icon)));
+            }
+        }
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+    }
 }
