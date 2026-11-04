@@ -50,6 +50,35 @@ public sealed class AppCatalogService
             .ToArray();
     }
 
+    public IReadOnlyList<AppShortcut> DiscoverDesktopShortcuts()
+    {
+        var roots = new[]
+        {
+            Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
+            Environment.GetFolderPath(Environment.SpecialFolder.CommonDesktopDirectory)
+        };
+
+        var shortcuts = new Dictionary<string, AppShortcut>(StringComparer.OrdinalIgnoreCase);
+        foreach (var root in roots.Where(path => !string.IsNullOrWhiteSpace(path) && Directory.Exists(path)))
+        {
+            try
+            {
+                foreach (var path in Directory.EnumerateFiles(root, "*.lnk", SearchOption.TopDirectoryOnly))
+                {
+                    var name = Path.GetFileNameWithoutExtension(path);
+                    if (!string.IsNullOrWhiteSpace(name))
+                        shortcuts.TryAdd(path, new AppShortcut(name, path, "Desktop"));
+                }
+            }
+            catch (UnauthorizedAccessException) { }
+            catch (IOException) { }
+        }
+
+        return shortcuts.Values
+            .OrderBy(item => item.Name, StringComparer.CurrentCultureIgnoreCase)
+            .ToArray();
+    }
+
     public void Launch(AppShortcut app)
     {
         ArgumentNullException.ThrowIfNull(app);
