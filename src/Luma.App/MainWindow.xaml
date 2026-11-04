@@ -73,6 +73,7 @@
                             <TextBox x:Name="AppSearchBox" PlaceholderText="Search installed applications" TextChanged="AppSearch_TextChanged"/>
                             <Button Grid.Column="1" Content="Refresh" Click="RefreshApps_Click"/>
                         </Grid>
+                        <ComboBox x:Name="AppCategoryFilter" PlaceholderText="All categories" SelectionChanged="AppCategory_SelectionChanged" Margin="0,0,0,4"/>
                         <TextBlock x:Name="AppsStatusText" Text="Discovering Start Menu shortcuts..." Foreground="#9298AA" FontSize="12"/>
                         <ListView x:Name="AppsList" Height="460" SelectionMode="None">
                             <ListView.ItemTemplate>
@@ -99,7 +100,7 @@
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Button Content="{Binding Name}" Tag="{Binding ShortcutPath}" Click="DockApp_Click" MinWidth="76" MaxWidth="150"/>
+                            <StackPanel Orientation="Horizontal" Spacing="3"><Button Content="{Binding Name}" Tag="{Binding ShortcutPath}" Click="DockApp_Click" MinWidth="76" MaxWidth="150"/><Button Content="×" Tag="{Binding ShortcutPath}" Click="UnpinDockApp_Click" MinWidth="30"/></StackPanel>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
