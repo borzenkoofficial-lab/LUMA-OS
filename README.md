@@ -1,32 +1,38 @@
-# LUMA OS
+# LUMA
 
-A native Windows shell experience built with C# and WinUI 3.
+**A macOS-inspired shell transformation for Windows 11.**
 
-## Project status
+LUMA keeps Windows as the operating system and transforms the desktop experience: Dock, Launchpad, Spotlight, visual theme, wallpapers, desktop shortcuts, and—over time—more Windows shell surfaces.
 
-Early foundation stage. The repository is being initialized; no shell-replacement behavior is enabled yet.
+LUMA is not a new operating system, a virtual machine, or a separate desktop that merely imitates Windows. Windows continues to provide the kernel, drivers, services, security, filesystem, and native application runtime.
 
-## Planned architecture
+## Product direction
 
-- LUMA Shell — application host and navigation
-- Desktop — desktop surface and wallpaper layer
-- Dock — pinned and running applications
-- Launchpad — searchable application launcher
-- Spotlight — global command and search surface
-- Control Center — quick system controls
-- Windows Integration — isolated Win32 integration services
+- Install LUMA with one Windows installer.
+- Preview and approve the changes before applying them.
+- Transform the Windows desktop progressively, starting with reversible per-user changes.
+- Keep Explorer and native Windows recovery available in the first release.
+- Add opt-in shell replacement only after safe mode, rollback, and crash recovery are proven.
+
+## First usable release
+
+- Native LUMA Dock for pinned and running Windows apps.
+- Launchpad and Spotlight.
+- LUMA wallpapers, theme, and shortcut icon set.
+- Per-user startup option with explicit consent.
+- Recovery, disable, and uninstall with restoration of changed settings.
 
 ## Technology
 
-- C# / .NET 10
-- WinUI 3 / Windows App SDK
-- Windows Composition APIs
-- SQLite for local state (planned)
+- C# / .NET
+- WinUI 3 / Windows App SDK for native Windows surfaces
+- Windows APIs isolated behind integration adapters
+- Per-user configuration and theme assets
 
 ## Safety
 
-LUMA will not disable or replace Windows Explorer until a tested recovery path, startup rollback, and safe-mode workflow exist. Early builds are development previews, not production shell replacements.
+LUMA does not replace Windows, patch protected system binaries, disable security surfaces, or silently replace Explorer. Each applied setting must be recorded and reversible. Explorer remains available as a recovery path until shell-replacement mode passes dedicated safety gates.
 
-## Build
+## Architecture and roadmap
 
-The solution and Windows build workflow will be added during the foundation milestone.
+See [Windows shell transformation architecture](docs/WINDOWS-SHELL-ARCHITECTURE.md) and [roadmap](docs/ROADMAP.md).
