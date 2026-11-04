@@ -39,5 +39,16 @@ public sealed class DesktopPreferencesService
         File.Move(temporaryPath, _settingsPath, overwrite: true);
     }
 
+    public void ClearWallpaperPath()
+    {
+        try
+        {
+            if (File.Exists(_settingsPath))
+                File.Delete(_settingsPath);
+        }
+        catch (IOException) { throw; }
+        catch (UnauthorizedAccessException) { throw; }
+    }
+
     private sealed record DesktopPreferences(string WallpaperPath);
 }
