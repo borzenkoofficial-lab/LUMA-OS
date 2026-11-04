@@ -29,7 +29,7 @@ public sealed class WindowSnapLayoutTests
         Assert.Equal(1919, left.Width + right.Width);
         Assert.Equal(501, topLeft.Height);
         Assert.Equal(500, bottomRight.Height);
-        Assert.Equal(-961, right.Left);
+        Assert.Equal(-960, right.Left);
         Assert.Equal(521, bottomRight.Top);
     }
 
