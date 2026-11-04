@@ -19,6 +19,8 @@
                 </Grid.ColumnDefinitions>
                 <Button x:Name="LumaButton"
                         Click="LumaButton_Click"
+                        PointerEntered="DockButton_PointerEntered"
+                        PointerExited="DockButton_PointerExited"
                         Background="#E8EAF4"
                         Foreground="#171923"
                         BorderThickness="0"
@@ -46,6 +48,8 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
                     <Button x:Name="LaunchpadButton" Grid.Column="0" Click="LaunchpadButton_Click"
+                            PointerEntered="DockButton_PointerEntered"
+                            PointerExited="DockButton_PointerExited"
                             Background="Transparent" BorderThickness="0" Padding="3,0"
                             Width="72" Height="76" AutomationProperties.Name="Open Launchpad">
                         <StackPanel Width="66" Spacing="3" HorizontalAlignment="Center">
@@ -77,6 +81,8 @@
                             <DataTemplate>
                                 <Button Tag="{Binding ShortcutPath}"
                                         Click="LaunchApp_Click"
+                                        PointerEntered="DockButton_PointerEntered"
+                                        PointerExited="DockButton_PointerExited"
                                         Background="Transparent"
                                         BorderThickness="0"
                                         Padding="3,0"
