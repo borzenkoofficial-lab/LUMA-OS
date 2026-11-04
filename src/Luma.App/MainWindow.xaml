@@ -49,7 +49,7 @@
                         <StackPanel Spacing="8">
                             <TextBlock Text="PERSONAL WORKSPACE" Foreground="#9DA8C8" FontSize="11" CharacterSpacing="160"/>
                             <TextBlock Text="Your desktop, your atmosphere." Foreground="#F5F6FA" FontSize="34" FontWeight="SemiBold" TextWrapping="Wrap"/>
-                            <TextBlock Text="Choose a wallpaper for the LUMA workspace preview. Your selection is saved locally and restored the next time LUMA starts." Foreground="#A8ADBC" FontSize="14" MaxWidth="680" TextWrapping="Wrap" LineHeight="22"/>
+                            <TextBlock Text="Choose a LUMA wallpaper, then apply the appearance to your actual Windows desktop. Original settings are backed up for restoration." Foreground="#A8ADBC" FontSize="14" MaxWidth="680" TextWrapping="Wrap" LineHeight="22"/>
                         </StackPanel>
                         <Border Background="#202330" CornerRadius="18" Padding="20">
                             <StackPanel Spacing="12">
@@ -59,7 +59,12 @@
                                     <Button Content="Choose image" Click="ChooseWallpaper_Click"/>
                                     <Button Content="Remove wallpaper" Click="RemoveWallpaper_Click"/>
                                 </StackPanel>
-                                <TextBlock Text="Supported formats: PNG, JPG, JPEG, BMP. This changes only the LUMA preview, not the Windows system wallpaper." Foreground="#858A9B" FontSize="11" TextWrapping="Wrap"/>
+                                <StackPanel Orientation="Horizontal" Spacing="10">
+                                    <Button Content="Apply LUMA to Windows" Click="ApplyWindowsAppearance_Click"/>
+                                    <Button Content="Restore previous appearance" Click="RestoreWindowsAppearance_Click"/>
+                                </StackPanel>
+                                <TextBlock x:Name="WindowsAppearanceStatus" Text="Windows appearance has not been changed." Foreground="#858A9B" FontSize="11" TextWrapping="Wrap"/>
+                                <TextBlock Text="Applying changes the Windows wallpaper, dark app/system theme, and centered taskbar alignment. LUMA saves original values and restores them only when they have not been changed again by you." Foreground="#858A9B" FontSize="11" TextWrapping="Wrap"/>
                             </StackPanel>
                         </Border>
                         <Border Background="#202330" CornerRadius="18" Padding="18">
