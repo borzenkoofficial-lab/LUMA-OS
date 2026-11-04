@@ -68,7 +68,7 @@
                                     <Button Grid.Column="1" Content="Refresh" Click="RefreshDesktop_Click"/>
                                 </Grid>
                                 <TextBlock x:Name="DesktopShortcutsStatus" Text="Loading desktop shortcuts..." Foreground="#A8ADBC" FontSize="12"/>
-                                <ListView x:Name="DesktopItemsList" SelectionMode="None" MaxHeight="260">
+                                <ListView x:Name="DesktopItemsList" SelectionMode="None" MaxHeight="320" CanDragItems="True" CanReorderItems="True" DragItemsCompleted="DesktopItems_DragItemsCompleted">
                                     <ListView.ItemsPanel>
                                         <ItemsPanelTemplate><ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="4"/></ItemsPanelTemplate>
                                     </ListView.ItemsPanel>
@@ -93,7 +93,7 @@
                                         </DataTemplate>
                                     </ListView.ItemTemplate>
                                 </ListView>
-                                <TextBlock Text="Only .lnk shortcuts from the Windows Desktop folders are shown. Drag-and-drop placement and file operations are not enabled yet." Foreground="#858A9B" FontSize="11" TextWrapping="Wrap"/>
+                                <TextBlock Text="Drag shortcuts to reorder them. LUMA saves the order locally. Only .lnk shortcuts are currently supported; native file and folder operations are still in development." Foreground="#858A9B" FontSize="11" TextWrapping="Wrap"/>
                             </StackPanel>
                         </Border>
                         <Border Background="#1B1E29" CornerRadius="18" Padding="18">

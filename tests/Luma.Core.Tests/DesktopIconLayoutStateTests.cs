@@ -38,4 +38,40 @@ public sealed class DesktopIconLayoutStateTests
         Assert.False(state.Move("B.lnk", 1));
         Assert.False(state.Move("missing.lnk", 1));
     }
+    [Fact]
+    public void MoveToSupportsDirectReordering()
+    {
+        var state = new DesktopIconLayoutState();
+        state.Restore(["A.lnk", "B.lnk", "C.lnk", "D.lnk"]);
+
+        Assert.True(state.MoveTo("A.lnk", 3));
+        Assert.Equal(["B.lnk", "C.lnk", "D.lnk", "A.lnk"], state.OrderedPaths);
+
+        Assert.True(state.MoveTo("D.lnk", 0));
+        Assert.Equal(["D.lnk", "B.lnk", "C.lnk", "A.lnk"], state.OrderedPaths);
+    }
+
+    [Fact]
+    public void MoveToRejectsInvalidTargetsAndMissingItems()
+    {
+        var state = new DesktopIconLayoutState();
+        state.Restore(["A.lnk", "B.lnk"]);
+
+        Assert.False(state.MoveTo("A.lnk", -1));
+        Assert.False(state.MoveTo("A.lnk", 2));
+        Assert.False(state.MoveTo("missing.lnk", 0));
+        Assert.False(state.MoveTo("A.lnk", 0));
+        Assert.Equal(["A.lnk", "B.lnk"], state.OrderedPaths);
+    }
+
+    [Fact]
+    public void RestoreRemovesBlankAndCaseInsensitiveDuplicates()
+    {
+        var state = new DesktopIconLayoutState();
+
+        state.Restore(["A.lnk", "", "a.LNK", "B.lnk", "  "]);
+
+        Assert.Equal(["A.lnk", "B.lnk"], state.OrderedPaths);
+    }
+
 }

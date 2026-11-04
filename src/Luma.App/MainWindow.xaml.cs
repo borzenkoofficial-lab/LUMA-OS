@@ -315,6 +315,21 @@ public sealed partial class MainWindow : Window
     private void DesktopShortcutMoveUp_Click(object sender, RoutedEventArgs e) => MoveDesktopShortcut(sender, -1);
     private void DesktopShortcutMoveDown_Click(object sender, RoutedEventArgs e) => MoveDesktopShortcut(sender, 1);
 
+    private void DesktopItems_DragItemsCompleted(ListViewBase sender, DragItemsCompletedEventArgs e)
+    {
+        _desktopLayout.Restore(_desktopApps.Select(item => item.ShortcutPath));
+
+        try
+        {
+            _desktopLayoutService.Save(_desktopLayout.OrderedPaths);
+            DesktopShortcutsStatus.Text = "Desktop order updated and saved.";
+        }
+        catch (Exception ex)
+        {
+            DesktopShortcutsStatus.Text = $"The new order is active, but could not be saved: {ex.Message}";
+        }
+    }
+
     private void RefreshDesktop_Click(object sender, RoutedEventArgs e) => RefreshDesktopShortcuts();
 
     private void DesktopShortcut_Click(object sender, RoutedEventArgs e)

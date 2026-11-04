@@ -38,6 +38,23 @@ public sealed class DesktopIconLayoutState
             .Distinct(StringComparer.OrdinalIgnoreCase));
     }
 
+    public bool MoveTo(string path, int targetIndex)
+    {
+        if (string.IsNullOrWhiteSpace(path) || targetIndex < 0 || targetIndex >= _orderedPaths.Count)
+            return false;
+
+        var currentIndex = _orderedPaths.FindIndex(item =>
+            string.Equals(item, path, StringComparison.OrdinalIgnoreCase));
+
+        if (currentIndex < 0 || currentIndex == targetIndex)
+            return false;
+
+        var item = _orderedPaths[currentIndex];
+        _orderedPaths.RemoveAt(currentIndex);
+        _orderedPaths.Insert(targetIndex, item);
+        return true;
+    }
+
     public bool Move(string path, int offset)
     {
         if (string.IsNullOrWhiteSpace(path))

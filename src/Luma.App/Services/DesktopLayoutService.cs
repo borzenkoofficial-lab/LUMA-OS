@@ -15,7 +15,8 @@ public sealed class DesktopLayoutService
             if (!File.Exists(_layoutPath))
                 return Array.Empty<string>();
 
-            return JsonSerializer.Deserialize<string[]>(File.ReadAllText(_layoutPath)) ?? Array.Empty<string>();
+            var paths = JsonSerializer.Deserialize<string[]>(File.ReadAllText(_layoutPath));
+            return Normalize(paths ?? Array.Empty<string>());
         }
         catch (JsonException) { return Array.Empty<string>(); }
         catch (IOException) { return Array.Empty<string>(); }
@@ -25,10 +26,27 @@ public sealed class DesktopLayoutService
     public void Save(IEnumerable<string> orderedPaths)
     {
         ArgumentNullException.ThrowIfNull(orderedPaths);
+
+        var normalized = Normalize(orderedPaths);
         var directory = Path.GetDirectoryName(_layoutPath)!;
         Directory.CreateDirectory(directory);
         var temporaryPath = _layoutPath + ".tmp";
-        File.WriteAllText(temporaryPath, JsonSerializer.Serialize(orderedPaths.ToArray(), new JsonSerializerOptions { WriteIndented = true }));
-        File.Move(temporaryPath, _layoutPath, overwrite: true);
+
+        try
+        {
+            File.WriteAllText(temporaryPath, JsonSerializer.Serialize(
+                normalized, new JsonSerializerOptions { WriteIndented = true }));
+            File.Move(temporaryPath, _layoutPath, overwrite: true);
+        }
+        finally
+        {
+            if (File.Exists(temporaryPath))
+                File.Delete(temporaryPath);
+        }
     }
+
+    private static string[] Normalize(IEnumerable<string> paths) => paths
+        .Where(path => !string.IsNullOrWhiteSpace(path))
+        .Distinct(StringComparer.OrdinalIgnoreCase)
+        .ToArray();
 }
