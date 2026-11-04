@@ -2,7 +2,7 @@ using System.Diagnostics;
 
 namespace Luma.App.Services;
 
-public sealed record AppShortcut(string Name, string ShortcutPath);
+public sealed record AppShortcut(string Name, string ShortcutPath, string Category = "Other");
 
 public sealed class AppCatalogService
 {
@@ -15,42 +15,44 @@ public sealed class AppCatalogService
         };
 
         var apps = new Dictionary<string, AppShortcut>(StringComparer.OrdinalIgnoreCase);
-
         foreach (var root in roots.Where(Directory.Exists))
         {
-            IEnumerable<string> shortcuts;
-            try
-            {
-                shortcuts = Directory.EnumerateFiles(root, "*.lnk", SearchOption.AllDirectories).ToArray();
-            }
-            catch (UnauthorizedAccessException)
-            {
-                continue;
-            }
-            catch (IOException)
-            {
-                continue;
-            }
+            var pending = new Stack<string>();
+            pending.Push(root);
 
-            foreach (var shortcut in shortcuts)
+            while (pending.Count > 0)
             {
-                var name = Path.GetFileNameWithoutExtension(shortcut);
-                if (string.IsNullOrWhiteSpace(name))
-                    continue;
+                var directory = pending.Pop();
+                try
+                {
+                    foreach (var shortcut in Directory.EnumerateFiles(directory, "*.lnk", SearchOption.TopDirectoryOnly))
+                    {
+                        var name = Path.GetFileNameWithoutExtension(shortcut);
+                        if (string.IsNullOrWhiteSpace(name))
+                            continue;
 
-                apps.TryAdd(shortcut, new AppShortcut(name, shortcut));
+                        var relative = Path.GetRelativePath(root, directory);
+                        var category = relative == "." ? "Other" : relative.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)[0];
+                        apps.TryAdd(shortcut, new AppShortcut(name, shortcut, category));
+                    }
+
+                    foreach (var child in Directory.EnumerateDirectories(directory, "*", SearchOption.TopDirectoryOnly))
+                        pending.Push(child);
+                }
+                catch (UnauthorizedAccessException) { }
+                catch (IOException) { }
             }
         }
 
         return apps.Values
-            .OrderBy(app => app.Name, StringComparer.CurrentCultureIgnoreCase)
+            .OrderBy(app => app.Category, StringComparer.CurrentCultureIgnoreCase)
+            .ThenBy(app => app.Name, StringComparer.CurrentCultureIgnoreCase)
             .ToArray();
     }
 
     public void Launch(AppShortcut app)
     {
         ArgumentNullException.ThrowIfNull(app);
-
         if (!File.Exists(app.ShortcutPath))
             throw new FileNotFoundException("The application shortcut no longer exists.", app.ShortcutPath);
 
