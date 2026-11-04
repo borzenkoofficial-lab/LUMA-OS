@@ -80,16 +80,16 @@
                                                 <Button Content="{Binding Name}" Tag="{Binding FullPath}" Click="DesktopItem_Click" Height="58">
                                                     <Button.ContextFlyout>
                                                         <MenuFlyout>
-                                                            <MenuFlyoutItem Text="Open" Tag="{Binding ShortcutPath}" Click="DesktopItemMenuOpen_Click"/>
-                                                            <MenuFlyoutItem Text="Show in File Explorer" Tag="{Binding ShortcutPath}" Click="DesktopItemReveal_Click"/>
-                                                            <MenuFlyoutItem Text="Move left / up" Tag="{Binding ShortcutPath}" Click="DesktopShortcutMoveUp_Click"/>
-                                                            <MenuFlyoutItem Text="Move right / down" Tag="{Binding ShortcutPath}" Click="DesktopShortcutMoveDown_Click"/>
+                                                            <MenuFlyoutItem Text="Open" Tag="{Binding FullPath}" Click="DesktopItemMenuOpen_Click"/>
+                                                            <MenuFlyoutItem Text="Show in File Explorer" Tag="{Binding FullPath}" Click="DesktopItemReveal_Click"/>
+                                                            <MenuFlyoutItem Text="Move left / up" Tag="{Binding FullPath}" Click="DesktopShortcutMoveUp_Click"/>
+                                                            <MenuFlyoutItem Text="Move right / down" Tag="{Binding FullPath}" Click="DesktopShortcutMoveDown_Click"/>
                                                         </MenuFlyout>
                                                     </Button.ContextFlyout>
                                                 </Button>
                                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="6">
-                                                    <Button Content="↑" Tag="{Binding ShortcutPath}" Click="DesktopShortcutMoveUp_Click" MinWidth="54"/>
-                                                    <Button Content="↓" Tag="{Binding ShortcutPath}" Click="DesktopShortcutMoveDown_Click" MinWidth="54"/>
+                                                    <Button Content="↑" Tag="{Binding FullPath}" Click="DesktopShortcutMoveUp_Click" MinWidth="54"/>
+                                                    <Button Content="↓" Tag="{Binding FullPath}" Click="DesktopShortcutMoveDown_Click" MinWidth="54"/>
                                                 </StackPanel>
                                             </StackPanel>
                                         </DataTemplate>
@@ -132,7 +132,7 @@
                                                     <TextBlock Text="{Binding Details}" Foreground="#858A9B" FontSize="10"/>
                                                 </StackPanel>
                                                 <TextBlock Grid.Column="1" Text="{Binding Kind}" Foreground="#9DA8C8" FontSize="10" VerticalAlignment="Center"/>
-                                                <Button Grid.Column="2" Content="Open" Tag="{Binding FullPath}" Click="FileEntry_Open_Click"/>
+                                                <Button Grid.Column="2" Content="Open" Tag="{Binding ShortcutPath}" Click="FileEntry_Open_Click"/>
                                             </Grid>
                                         </DataTemplate>
                                     </ListView.ItemTemplate>
