@@ -30,8 +30,8 @@ jobs:
       - name: Restore
         run: dotnet restore LUMA.sln --runtime win-x64
 
-      - name: Build
-        run: dotnet build LUMA.sln --configuration Release --no-restore --runtime win-x64
+      - name: Build Windows x64 app
+        run: dotnet build src/Luma.App/Luma.App.csproj --configuration Release --no-restore --runtime win-x64 -p:WindowsAppSDKSelfContained=true -p:WindowsPackageType=None -p:EnableMsixTooling=true -p:PublishTrimmed=false -p:IsTrimmable=false
 
       - name: Test core
         run: dotnet test tests/Luma.Core.Tests/Luma.Core.Tests.csproj --configuration Release --no-restore
@@ -73,7 +73,7 @@ jobs:
         shell: pwsh
         run: |
           choco install innosetup --no-progress -y
-          $compiler = Join-Path ${env:ProgramFiles(x86)} "Inno Setup 6\ISCC.exe"
+          $compiler = Join-Path ${env:ProgramFiles(x86)} "Inno Setup 6\\ISCC.exe"
           if (!(Test-Path $compiler)) {
             throw "Inno Setup compiler was not found at $compiler."
           }
@@ -82,7 +82,7 @@ jobs:
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path artifacts | Out-Null
-          $compiler = Join-Path ${env:ProgramFiles(x86)} "Inno Setup 6\ISCC.exe"
+          $compiler = Join-Path ${env:ProgramFiles(x86)} "Inno Setup 6\\ISCC.exe"
           $publishDir = (Resolve-Path "publish/win-x64").Path
           $artifactsDir = (Resolve-Path "artifacts").Path
           & $compiler "/O$artifactsDir" "/DPublishDir=$publishDir" "installer/LUMA-OS.iss"
