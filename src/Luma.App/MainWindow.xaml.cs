@@ -90,7 +90,7 @@ public sealed partial class MainWindow : Window
         }
         catch (Exception ex)
         {
-            DesktopShortcutsStatus.Text = $"Could not read desktop shortcuts: {ex.Message}";
+            DesktopShortcutsStatus.Text = $"Could not read desktop items: {ex.Message}";
         }
     }
 
@@ -312,7 +312,7 @@ public sealed partial class MainWindow : Window
 
         if (path is null || !_desktopLayout.Move(path, offset))
         {
-            DesktopShortcutsStatus.Text = "Shortcut is already at that edge or no longer exists.";
+            DesktopShortcutsStatus.Text = "Item is already at that edge or no longer exists.";
             return;
         }
 

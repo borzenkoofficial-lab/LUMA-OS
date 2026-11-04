@@ -87,6 +87,7 @@
                                                         </MenuFlyout>
                                                     </Button.ContextFlyout>
                                                 </Button>
+                                                <TextBlock Text="{Binding KindLabel}" Foreground="#858A9B" FontSize="9" HorizontalAlignment="Center"/>
                                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="6">
                                                     <Button Content="↑" Tag="{Binding FullPath}" Click="DesktopShortcutMoveUp_Click" MinWidth="54"/>
                                                     <Button Content="↓" Tag="{Binding FullPath}" Click="DesktopShortcutMoveDown_Click" MinWidth="54"/>
