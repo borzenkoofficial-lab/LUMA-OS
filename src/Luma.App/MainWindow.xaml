@@ -39,6 +39,7 @@
             </Border>
             <ScrollViewer Grid.Column="1" Padding="28,8,8,8">
                 <StackPanel Spacing="22">
+                    <StackPanel x:Name="OverviewPanel" Spacing="22">
                     <StackPanel Spacing="8">
                         <TextBlock x:Name="EyebrowText" Text="YOUR WINDOWS, REIMAGINED" Foreground="#9DA8C8" FontSize="11" CharacterSpacing="160"/>
                         <TextBlock x:Name="HeadingText" Text="A calmer way to work." Foreground="#F5F6FA" FontSize="38" FontWeight="SemiBold" TextWrapping="Wrap"/>
@@ -63,6 +64,26 @@
                             <TextBlock Text="The current build is an application preview. It does not replace Explorer, alter system startup, or take ownership of the Windows desktop." Foreground="#A8ADBC" FontSize="13" TextWrapping="Wrap" LineHeight="21"/>
                         </StackPanel>
                     </Border>
+                </StackPanel>
+                    <StackPanel x:Name="ApplicationsPanel" Visibility="Collapsed" Spacing="14">
+                        <Grid ColumnSpacing="10">
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                            <TextBox x:Name="AppSearchBox" PlaceholderText="Search installed applications" TextChanged="AppSearch_TextChanged"/>
+                            <Button Grid.Column="1" Content="Refresh" Click="RefreshApps_Click"/>
+                        </Grid>
+                        <TextBlock x:Name="AppsStatusText" Text="Discovering Start Menu shortcuts..." Foreground="#9298AA" FontSize="12"/>
+                        <ListView x:Name="AppsList" Height="460" SelectionMode="None">
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Padding="10" ColumnSpacing="12">
+                                        <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                        <TextBlock Text="{Binding Name}" Foreground="#F5F6FA" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                        <Button Grid.Column="1" Content="Open" Tag="{Binding ShortcutPath}" Click="LaunchApp_Click"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </StackPanel>
                 </StackPanel>
             </ScrollViewer>
         </Grid>
