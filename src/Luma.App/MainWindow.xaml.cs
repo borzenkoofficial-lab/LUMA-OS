@@ -235,8 +235,16 @@ public sealed partial class MainWindow : Window
 
     private void RemoveWallpaper_Click(object sender, RoutedEventArgs e)
     {
-        WorkspaceWallpaper.Source = null;
-        WallpaperStatusText.Text = "Wallpaper preview cleared. The saved file remains unchanged until a new image is selected.";
+        try
+        {
+            _desktopPreferences.ClearWallpaperPath();
+            WorkspaceWallpaper.Source = null;
+            WallpaperStatusText.Text = "Custom wallpaper removed.";
+        }
+        catch (Exception ex)
+        {
+            WallpaperStatusText.Text = $"Could not remove wallpaper preference: {ex.Message}";
+        }
     }
 
     private void Desktop_Click(object sender, RoutedEventArgs e) =>
