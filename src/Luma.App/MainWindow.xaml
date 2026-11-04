@@ -228,7 +228,7 @@
                 </StackPanel>
             </ScrollViewer>
         </Grid>
-        <Border Grid.Row="2" Background="#191B24" CornerRadius="18" Margin="28,0,28,12" Padding="12,8">
+        <Border Grid.Row="2" Background="#191B24" CornerRadius="18" Margin="28,0,28,12" Padding="12,8" Visibility="Collapsed">
             <StackPanel Spacing="6">
                 <TextBlock Text="DOCK" Foreground="#858A9B" FontSize="9" CharacterSpacing="130" HorizontalAlignment="Center"/>
                 <ItemsControl x:Name="DockItemsControl">
