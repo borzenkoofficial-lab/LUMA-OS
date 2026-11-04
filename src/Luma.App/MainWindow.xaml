@@ -32,6 +32,7 @@
                     <TextBlock Text="WORKSPACE" Foreground="#74798B" FontSize="10" CharacterSpacing="130" Margin="10,8,0,10"/>
                     <Button Content="⌂   Overview" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Click="Home_Click"/>
                     <Button Content="▤   Desktop" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Click="Desktop_Click"/>
+                    <Button Content="▣   Windows" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Click="Windows_Click"/>
                     <Button Content="▦   Applications" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Click="Applications_Click"/>
                     <Button Content="◈   Widgets" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Click="Widgets_Click"/>
                     <Button Content="⚙   Settings" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Click="Settings_Click"/>
@@ -101,6 +102,39 @@
                                 <TextBlock Text="DESKTOP LAYER" Foreground="#9DA8C8" FontSize="10" CharacterSpacing="130"/>
                                 <TextBlock Text="Workspace preview is active" Foreground="#F5F6FA" FontSize="17" FontWeight="SemiBold"/>
                                 <TextBlock Text="Native desktop icons, drag-and-drop placement, context menus, and live window integration will be added in subsequent milestones." Foreground="#A8ADBC" FontSize="12" TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                    <StackPanel x:Name="WindowsPanel" Visibility="Collapsed" Spacing="16">
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="WINDOW MANAGER" Foreground="#9DA8C8" FontSize="11" CharacterSpacing="160"/>
+                            <TextBlock Text="Every open window, under control." Foreground="#F5F6FA" FontSize="34" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                            <TextBlock Text="Inspect visible desktop windows, bring an application forward, minimize it, or send a standard close request. LUMA never terminates another process." Foreground="#A8ADBC" FontSize="14" MaxWidth="720" TextWrapping="Wrap"/>
+                        </StackPanel>
+                        <Border Background="#202330" CornerRadius="18" Padding="18">
+                            <StackPanel Spacing="12">
+                                <Grid>
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                    <TextBlock Text="OPEN WINDOWS" Foreground="#9DA8C8" FontSize="10" CharacterSpacing="140" VerticalAlignment="Center"/>
+                                    <Button Grid.Column="1" Content="Refresh" Click="RefreshWindows_Click"/>
+                                </Grid>
+                                <TextBlock x:Name="WindowManagerStatus" Text="Window list has not been refreshed." Foreground="#A8ADBC" FontSize="12"/>
+                                <ListView x:Name="WindowItemsList" MaxHeight="520" SelectionMode="None">
+                                    <ListView.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid Padding="10" ColumnSpacing="10">
+                                                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                                <StackPanel Spacing="3" VerticalAlignment="Center">
+                                                    <TextBlock Text="{Binding Title}" Foreground="#F5F6FA" FontSize="13" TextTrimming="CharacterEllipsis"/>
+                                                    <TextBlock Text="{Binding ProcessName}" Foreground="#858A9B" FontSize="10"/>
+                                                </StackPanel>
+                                                <Button Grid.Column="1" Content="Focus" Tag="{Binding Handle}" Click="ActivateWindow_Click"/>
+                                                <Button Grid.Column="2" Content="Minimize" Tag="{Binding Handle}" Click="MinimizeWindow_Click"/>
+                                                <Button Grid.Column="3" Content="Close" Tag="{Binding Handle}" Click="CloseWindow_Click"/>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ListView.ItemTemplate>
+                                </ListView>
                             </StackPanel>
                         </Border>
                     </StackPanel>

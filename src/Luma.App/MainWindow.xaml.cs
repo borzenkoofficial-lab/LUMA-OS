@@ -13,6 +13,7 @@ public sealed partial class MainWindow : Window
 {
     private readonly ShellNavigationState _navigation = new();
     private readonly AppCatalogService _appCatalog = new();
+    private readonly WindowManagerService _windowManager = new();
     private readonly DockService _dockService = new();
     private readonly DesktopPreferencesService _desktopPreferences = new();
     private readonly DesktopLayoutService _desktopLayoutService = new();
@@ -21,6 +22,7 @@ public sealed partial class MainWindow : Window
     private readonly ObservableCollection<AppShortcut> _visibleApps = new();
     private readonly ObservableCollection<AppShortcut> _pinnedApps = new();
     private readonly ObservableCollection<AppShortcut> _spotlightApps = new();
+    private readonly ObservableCollection<ManagedWindow> _managedWindows = new();
     private IReadOnlyList<AppShortcut> _allApps = Array.Empty<AppShortcut>();
     private bool _updatingCategories;
 
@@ -31,6 +33,7 @@ public sealed partial class MainWindow : Window
         DesktopItemsList.ItemsSource = _desktopApps;
         DockItemsControl.ItemsSource = _pinnedApps;
         SpotlightResults.ItemsSource = _spotlightApps;
+        WindowItemsList.ItemsSource = _managedWindows;
 
         foreach (var app in _dockService.Load())
             _pinnedApps.Add(app);
@@ -49,14 +52,18 @@ public sealed partial class MainWindow : Window
 
         var showApplications = section == ShellSection.Applications;
         var showDesktop = section == ShellSection.Desktop;
-        OverviewPanel.Visibility = showApplications || showDesktop ? Visibility.Collapsed : Visibility.Visible;
+        var showWindows = section == ShellSection.Windows;
+        OverviewPanel.Visibility = showApplications || showDesktop || showWindows ? Visibility.Collapsed : Visibility.Visible;
         ApplicationsPanel.Visibility = showApplications ? Visibility.Visible : Visibility.Collapsed;
         DesktopPanel.Visibility = showDesktop ? Visibility.Visible : Visibility.Collapsed;
+        WindowsPanel.Visibility = showWindows ? Visibility.Visible : Visibility.Collapsed;
 
         if (showApplications && _allApps.Count == 0)
             RefreshApplications();
         if (showDesktop)
             RefreshDesktopShortcuts();
+        if (showWindows)
+            RefreshWindows();
     }
 
     private void RefreshDesktopShortcuts()
@@ -365,6 +372,76 @@ public sealed partial class MainWindow : Window
             DesktopShortcutsStatus.Text = $"Could not open File Explorer: {ex.Message}";
         }
     }
+
+    private void RefreshWindows()
+    {
+        try
+        {
+            var ownHandle = WinRT.Interop.WindowNative.GetWindowHandle(this);
+            var windows = _windowManager.DiscoverWindows(ownHandle);
+            _managedWindows.Clear();
+            foreach (var window in windows)
+                _managedWindows.Add(window);
+
+            WindowManagerStatus.Text = windows.Count == 0
+                ? "No other visible application windows were found."
+                : $"{windows.Count} visible application windows.";
+        }
+        catch (Exception ex)
+        {
+            WindowManagerStatus.Text = $"Could not enumerate windows: {ex.Message}";
+        }
+    }
+
+    private static bool TryGetWindowHandle(object sender, out long handle)
+    {
+        if (sender is Button { Tag: long value })
+        {
+            handle = value;
+            return true;
+        }
+
+        handle = 0;
+        return false;
+    }
+
+    private void ActivateWindow_Click(object sender, RoutedEventArgs e)
+    {
+        if (!TryGetWindowHandle(sender, out var handle))
+            return;
+
+        WindowManagerStatus.Text = _windowManager.Activate(handle)
+            ? "Window activation requested."
+            : "Windows did not allow this window to become foreground.";
+    }
+
+    private void MinimizeWindow_Click(object sender, RoutedEventArgs e)
+    {
+        if (!TryGetWindowHandle(sender, out var handle))
+            return;
+
+        WindowManagerStatus.Text = _windowManager.Minimize(handle)
+            ? "Window minimized."
+            : "The window is no longer available.";
+        RefreshWindows();
+    }
+
+    private void CloseWindow_Click(object sender, RoutedEventArgs e)
+    {
+        if (!TryGetWindowHandle(sender, out var handle))
+            return;
+
+        WindowManagerStatus.Text = _windowManager.RequestClose(handle)
+            ? "A standard close request was sent. The application decides whether to save or cancel."
+            : "Could not send a close request to this window.";
+        RefreshWindows();
+    }
+
+    private void RefreshWindows_Click(object sender, RoutedEventArgs e) => RefreshWindows();
+
+    private void Windows_Click(object sender, RoutedEventArgs e) =>
+        Navigate(ShellSection.Windows, "WINDOW MANAGER", "Every open window, under control.",
+            "Inspect visible desktop windows, focus or minimize them, and send standard close requests without terminating processes.");
 
     private void Desktop_Click(object sender, RoutedEventArgs e) =>
         Navigate(ShellSection.Desktop, "PERSONAL WORKSPACE", "Your desktop, your atmosphere.",
