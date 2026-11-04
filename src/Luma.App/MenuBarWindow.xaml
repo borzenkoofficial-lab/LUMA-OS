@@ -11,6 +11,7 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
@@ -29,10 +30,13 @@
             <Button Grid.Column="4" Content="Search" Click="Spotlight_Click"
                     Background="Transparent" BorderThickness="0" Foreground="#E5E8F0"
                     FontSize="11" Padding="8,3"/>
-            <Button Grid.Column="6" Content="☼  Control Center" Click="ControlCenter_Click"
+            <Button Grid.Column="5" Content="Files" Click="Files_Click"
                     Background="Transparent" BorderThickness="0" Foreground="#E5E8F0"
                     FontSize="11" Padding="8,3"/>
-            <StackPanel Grid.Column="7" Orientation="Horizontal" Spacing="12"
+            <Button Grid.Column="7" Content="☼  Control Center" Click="ControlCenter_Click"
+                    Background="Transparent" BorderThickness="0" Foreground="#E5E8F0"
+                    FontSize="11" Padding="8,3"/>
+            <StackPanel Grid.Column="8" Orientation="Horizontal" Spacing="12"
                         VerticalAlignment="Center">
                 <TextBlock x:Name="DateText" Foreground="#E5E8F0" FontSize="11"
                            VerticalAlignment="Center"/>
