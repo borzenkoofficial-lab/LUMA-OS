@@ -1,4 +1,5 @@
 using Luma.Core.Navigation;
+using Xunit;
 
 namespace Luma.Core.Tests;
 
