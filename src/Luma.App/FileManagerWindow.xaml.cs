@@ -54,6 +54,12 @@ public sealed partial class FileManagerWindow : Window
 
     private void NavigateTo(string path, bool addHistory = true)
     {
+        if (string.IsNullOrWhiteSpace(path) || !Directory.Exists(path))
+        {
+            StatusText.Text = "The folder does not exist or is not accessible.";
+            return;
+        }
+
         if (!_pathState.TryNavigate(path))
         {
             StatusText.Text = "Invalid folder path.";
