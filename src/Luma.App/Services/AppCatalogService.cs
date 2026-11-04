@@ -4,6 +4,23 @@ namespace Luma.App.Services;
 
 public sealed record AppShortcut(string Name, string ShortcutPath, string Category = "Other");
 
+public enum DesktopItemKind
+{
+    Folder,
+    Shortcut,
+    File
+}
+
+public sealed record DesktopItem(string Name, string FullPath, DesktopItemKind Kind)
+{
+    public string KindLabel => Kind switch
+    {
+        DesktopItemKind.Folder => "FOLDER",
+        DesktopItemKind.Shortcut => "APP SHORTCUT",
+        _ => "FILE"
+    };
+}
+
 public sealed class AppCatalogService
 {
     public IReadOnlyList<AppShortcut> Discover()
@@ -50,7 +67,7 @@ public sealed class AppCatalogService
             .ToArray();
     }
 
-    public IReadOnlyList<AppShortcut> DiscoverDesktopShortcuts()
+    public IReadOnlyList<DesktopItem> DiscoverDesktopItems()
     {
         var roots = new[]
         {
@@ -58,25 +75,56 @@ public sealed class AppCatalogService
             Environment.GetFolderPath(Environment.SpecialFolder.CommonDesktopDirectory)
         };
 
-        var shortcuts = new Dictionary<string, AppShortcut>(StringComparer.OrdinalIgnoreCase);
+        var items = new Dictionary<string, DesktopItem>(StringComparer.OrdinalIgnoreCase);
         foreach (var root in roots.Where(path => !string.IsNullOrWhiteSpace(path) && Directory.Exists(path)))
         {
             try
             {
-                foreach (var path in Directory.EnumerateFiles(root, "*.lnk", SearchOption.TopDirectoryOnly))
+                foreach (var path in Directory.EnumerateFileSystemEntries(root, "*", SearchOption.TopDirectoryOnly))
                 {
-                    var name = Path.GetFileNameWithoutExtension(path);
-                    if (!string.IsNullOrWhiteSpace(name))
-                        shortcuts.TryAdd(path, new AppShortcut(name, path, "Desktop"));
+                    try
+                    {
+                        var attributes = File.GetAttributes(path);
+                        if ((attributes & (FileAttributes.Hidden | FileAttributes.System)) != 0)
+                            continue;
+
+                        var isDirectory = (attributes & FileAttributes.Directory) != 0;
+                        var kind = isDirectory
+                            ? DesktopItemKind.Folder
+                            : Path.GetExtension(path).Equals(".lnk", StringComparison.OrdinalIgnoreCase)
+                                ? DesktopItemKind.Shortcut
+                                : DesktopItemKind.File;
+                        var name = isDirectory || kind == DesktopItemKind.File
+                            ? Path.GetFileName(path)
+                            : Path.GetFileNameWithoutExtension(path);
+
+                        if (!string.IsNullOrWhiteSpace(name))
+                            items.TryAdd(path, new DesktopItem(name, path, kind));
+                    }
+                    catch (UnauthorizedAccessException) { }
+                    catch (IOException) { }
                 }
             }
             catch (UnauthorizedAccessException) { }
             catch (IOException) { }
         }
 
-        return shortcuts.Values
-            .OrderBy(item => item.Name, StringComparer.CurrentCultureIgnoreCase)
+        return items.Values
+            .OrderByDescending(item => item.Kind == DesktopItemKind.Folder)
+            .ThenBy(item => item.Name, StringComparer.CurrentCultureIgnoreCase)
             .ToArray();
+    }
+
+    public void OpenDesktopItem(DesktopItem item)
+    {
+        ArgumentNullException.ThrowIfNull(item);
+        var exists = item.Kind == DesktopItemKind.Folder
+            ? Directory.Exists(item.FullPath)
+            : File.Exists(item.FullPath);
+        if (!exists)
+            throw new FileNotFoundException("The desktop item no longer exists.", item.FullPath);
+
+        Process.Start(new ProcessStartInfo(item.FullPath) { UseShellExecute = true });
     }
 
     public void Launch(AppShortcut app)

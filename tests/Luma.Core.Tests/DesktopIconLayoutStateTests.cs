@@ -74,4 +74,17 @@ public sealed class DesktopIconLayoutStateTests
         Assert.Equal(["A.lnk", "B.lnk"], state.OrderedPaths);
     }
 
+    [Fact]
+    public void SynchronizeSupportsMixedDesktopFilesFoldersAndShortcuts()
+    {
+        var state = new DesktopIconLayoutState();
+        state.Restore(["C:/Desktop/Editor.lnk", "C:/Desktop/Projects", "C:/Desktop/notes.txt"]);
+
+        state.Synchronize(["C:/Desktop/notes.txt", "C:/Desktop/Editor.lnk", "C:/Desktop/Projects", "C:/Desktop/photo.png"]);
+
+        Assert.Equal(
+            ["C:/Desktop/Editor.lnk", "C:/Desktop/Projects", "C:/Desktop/notes.txt", "C:/Desktop/photo.png"],
+            state.OrderedPaths);
+    }
+
 }

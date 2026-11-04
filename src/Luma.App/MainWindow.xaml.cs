@@ -22,7 +22,7 @@ public sealed partial class MainWindow : Window
     private readonly DesktopPreferencesService _desktopPreferences = new();
     private readonly DesktopLayoutService _desktopLayoutService = new();
     private readonly DesktopIconLayoutState _desktopLayout = new();
-    private readonly ObservableCollection<AppShortcut> _desktopApps = new();
+    private readonly ObservableCollection<DesktopItem> _desktopEntries = new();
     private readonly ObservableCollection<AppShortcut> _visibleApps = new();
     private readonly ObservableCollection<AppShortcut> _pinnedApps = new();
     private readonly ObservableCollection<AppShortcut> _spotlightApps = new();
@@ -35,7 +35,7 @@ public sealed partial class MainWindow : Window
     {
         InitializeComponent();
         AppsList.ItemsSource = _visibleApps;
-        DesktopItemsList.ItemsSource = _desktopApps;
+        DesktopItemsList.ItemsSource = _desktopEntries;
         DockItemsControl.ItemsSource = _pinnedApps;
         SpotlightResults.ItemsSource = _spotlightApps;
         WindowItemsList.ItemsSource = _managedWindows;
@@ -80,17 +80,17 @@ public sealed partial class MainWindow : Window
     {
         try
         {
-            var shortcuts = _appCatalog.DiscoverDesktopShortcuts();
-            _desktopLayout.Synchronize(shortcuts.Select(item => item.ShortcutPath));
-            ApplyDesktopLayout(shortcuts);
+            var items = _appCatalog.DiscoverDesktopItems();
+            _desktopLayout.Synchronize(items.Select(item => item.FullPath));
+            ApplyDesktopLayout(items);
             _desktopLayoutService.Save(_desktopLayout.OrderedPaths);
-            DesktopShortcutsStatus.Text = shortcuts.Count == 0
-                ? "No desktop shortcuts found."
-                : $"{shortcuts.Count} desktop shortcuts • order saved locally.";
+            DesktopShortcutsStatus.Text = items.Count == 0
+                ? "No visible desktop items found."
+                : $"{items.Count} desktop items • order saved locally.";
         }
         catch (Exception ex)
         {
-            DesktopShortcutsStatus.Text = $"Could not read desktop shortcuts: {ex.Message}";
+            DesktopShortcutsStatus.Text = $"Could not read desktop items: {ex.Message}";
         }
     }
 
@@ -209,7 +209,7 @@ public sealed partial class MainWindow : Window
 
     private void LaunchShortcut(string shortcutPath, Action<string> report)
     {
-        var app = _allApps.Concat(_pinnedApps).Concat(_desktopApps)
+        var app = _allApps.Concat(_pinnedApps)
             .FirstOrDefault(item => string.Equals(item.ShortcutPath, shortcutPath, StringComparison.OrdinalIgnoreCase));
 
         if (app is null)
@@ -290,14 +290,14 @@ public sealed partial class MainWindow : Window
         }
     }
 
-    private void ApplyDesktopLayout(IReadOnlyList<AppShortcut> discovered)
+    private void ApplyDesktopLayout(IReadOnlyList<DesktopItem> discovered)
     {
-        var byPath = discovered.ToDictionary(item => item.ShortcutPath, StringComparer.OrdinalIgnoreCase);
-        _desktopApps.Clear();
+        var byPath = discovered.ToDictionary(item => item.FullPath, StringComparer.OrdinalIgnoreCase);
+        _desktopEntries.Clear();
         foreach (var path in _desktopLayout.OrderedPaths)
         {
-            if (byPath.TryGetValue(path, out var shortcut))
-                _desktopApps.Add(shortcut);
+            if (byPath.TryGetValue(path, out var item))
+                _desktopEntries.Add(item);
         }
     }
 
@@ -312,14 +312,14 @@ public sealed partial class MainWindow : Window
 
         if (path is null || !_desktopLayout.Move(path, offset))
         {
-            DesktopShortcutsStatus.Text = "Shortcut is already at that edge or no longer exists.";
+            DesktopShortcutsStatus.Text = "Item is already at that edge or no longer exists.";
             return;
         }
 
         try
         {
             _desktopLayoutService.Save(_desktopLayout.OrderedPaths);
-            var current = _desktopApps.ToArray();
+            var current = _desktopEntries.ToArray();
             ApplyDesktopLayout(current);
             DesktopShortcutsStatus.Text = "Desktop icon order saved.";
         }
@@ -334,7 +334,7 @@ public sealed partial class MainWindow : Window
 
     private void DesktopItems_DragItemsCompleted(ListViewBase sender, DragItemsCompletedEventArgs e)
     {
-        _desktopLayout.Restore(_desktopApps.Select(item => item.ShortcutPath));
+        _desktopLayout.Restore(_desktopEntries.Select(item => item.FullPath));
 
         try
         {
@@ -349,32 +349,65 @@ public sealed partial class MainWindow : Window
 
     private void RefreshDesktop_Click(object sender, RoutedEventArgs e) => RefreshDesktopShortcuts();
 
-    private void DesktopShortcut_Click(object sender, RoutedEventArgs e)
+    private void OpenDesktopEntry(string path)
     {
-        if (sender is Button { Tag: string path })
-            LaunchShortcut(path, message => DesktopShortcutsStatus.Text = message);
-    }
-
-    private void DesktopShortcutMenuOpen_Click(object sender, RoutedEventArgs e)
-    {
-        if (sender is MenuFlyoutItem { Tag: string path })
-            LaunchShortcut(path, message => DesktopShortcutsStatus.Text = message);
-    }
-
-    private void DesktopShortcutReveal_Click(object sender, RoutedEventArgs e)
-    {
-        if (sender is not MenuFlyoutItem { Tag: string path } || !File.Exists(path))
+        var item = _desktopEntries.FirstOrDefault(entry =>
+            string.Equals(entry.FullPath, path, StringComparison.OrdinalIgnoreCase));
+        if (item is null)
         {
-            DesktopShortcutsStatus.Text = "Shortcut no longer exists.";
+            DesktopShortcutsStatus.Text = "Desktop item no longer exists. Refresh the list.";
+            return;
+        }
+
+        if (item.Kind == DesktopItemKind.Folder)
+        {
+            NavigateFileBrowser(item.FullPath);
             return;
         }
 
         try
         {
-            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("explorer.exe", $"/select,\"{path}\"")
+            _appCatalog.OpenDesktopItem(item);
+            DesktopShortcutsStatus.Text = $"Opened {item.Name}.";
+        }
+        catch (Exception ex)
+        {
+            DesktopShortcutsStatus.Text = $"Could not open {item.Name}: {ex.Message}";
+        }
+    }
+
+    private void DesktopItem_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button { Tag: string path })
+            OpenDesktopEntry(path);
+    }
+
+    private void DesktopItemMenuOpen_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is MenuFlyoutItem { Tag: string path })
+            OpenDesktopEntry(path);
+    }
+
+    private void DesktopItemReveal_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is not MenuFlyoutItem { Tag: string path } || (!File.Exists(path) && !Directory.Exists(path)))
+        {
+            DesktopShortcutsStatus.Text = "Desktop item no longer exists.";
+            return;
+        }
+
+        try
+        {
+            var startInfo = new System.Diagnostics.ProcessStartInfo("explorer.exe")
             {
                 UseShellExecute = true
-            });
+            };
+            if (Directory.Exists(path))
+                startInfo.ArgumentList.Add(path);
+            else
+                startInfo.ArgumentList.Add($"/select,\"{path}\"");
+
+            System.Diagnostics.Process.Start(startInfo);
             DesktopShortcutsStatus.Text = $"Showing {Path.GetFileName(path)} in File Explorer.";
         }
         catch (Exception ex)
