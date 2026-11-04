@@ -3,7 +3,8 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     Title="LUMA Launchpad">
-    <Grid Background="#E9161922" Padding="34">
+    <Border Background="#E9161922" Padding="34">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -54,4 +55,5 @@
         <TextBlock x:Name="StatusText" Grid.Row="3" Text="Applications from your Windows Start Menu"
                    Foreground="#8D96AA" FontSize="10" HorizontalAlignment="Center" Margin="0,16,0,0"/>
     </Grid>
+    </Border>
 </Window>
