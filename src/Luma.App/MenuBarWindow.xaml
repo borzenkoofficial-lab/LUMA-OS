@@ -20,10 +20,10 @@
                     Click="Dashboard_Click" AutomationProperties.Name="LUMA menu"/>
             <TextBlock Grid.Column="1" Text="LUMA" FontSize="12" FontWeight="Bold"
                        Foreground="#F5F6FA" VerticalAlignment="Center"/>
-            <Button Grid.Column="2" Content="File" Click="Dashboard_Click"
+            <Button Grid.Column="2" Content="Desktop" Click="Dashboard_Click"
                     Background="Transparent" BorderThickness="0" Foreground="#E5E8F0"
                     FontSize="11" Padding="8,3"/>
-            <Button Grid.Column="3" Content="Window" Click="Launchpad_Click"
+            <Button Grid.Column="3" Content="Apps" Click="Launchpad_Click"
                     Background="Transparent" BorderThickness="0" Foreground="#E5E8F0"
                     FontSize="11" Padding="8,3"/>
             <Button Grid.Column="4" Content="Search" Click="Spotlight_Click"
