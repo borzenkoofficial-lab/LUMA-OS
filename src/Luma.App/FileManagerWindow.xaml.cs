@@ -19,6 +19,7 @@ public sealed partial class FileManagerWindow : Window
     private readonly ObservableCollection<FileSystemEntry> _visibleEntries = new();
     private IReadOnlyList<FileSystemEntry> _allEntries = Array.Empty<FileSystemEntry>();
     private readonly Stack<string> _history = new();
+    private string? _currentPath;
     private bool _showingDrives;
 
     public FileManagerWindow()
@@ -63,13 +64,13 @@ public sealed partial class FileManagerWindow : Window
         try
         {
             var entries = _browser.Browse(fullPath);
-            if (addHistory && PathBox.Text.Length > 0 &&
-                !string.IsNullOrWhiteSpace(PathBox.Text) &&
-                !string.Equals(Path.GetFullPath(PathBox.Text), fullPath, StringComparison.OrdinalIgnoreCase))
+            if (addHistory && !_showingDrives && !string.IsNullOrWhiteSpace(_currentPath) &&
+                !string.Equals(_currentPath, fullPath, StringComparison.OrdinalIgnoreCase))
             {
-                _history.Push(PathBox.Text);
+                _history.Push(_currentPath);
             }
 
+            _currentPath = fullPath;
             _showingDrives = false;
             _allEntries = entries;
             PathBox.Text = fullPath;
@@ -85,6 +86,9 @@ public sealed partial class FileManagerWindow : Window
 
     private void ShowDrives()
     {
+        if (!_showingDrives && !string.IsNullOrWhiteSpace(_currentPath))
+            _history.Push(_currentPath);
+        _currentPath = null;
         _showingDrives = true;
         _allEntries = DriveInfo.GetDrives()
             .Where(drive =>
