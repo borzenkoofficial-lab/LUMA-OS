@@ -4,7 +4,8 @@ namespace Luma.App;
 
 public partial class App : Application
 {
-    private Window? _window;
+    private MainWindow? _mainWindow;
+    private DockWindow? _dockWindow;
 
     public App()
     {
@@ -13,7 +14,17 @@ public partial class App : Application
 
     protected override void OnLaunched(LaunchActivatedEventArgs args)
     {
-        _window = new MainWindow();
-        _window.Activate();
+        _mainWindow = new MainWindow();
+        _mainWindow.Activate();
+
+        _dockWindow = new DockWindow(OpenDashboard);
+        _dockWindow.Activate();
+    }
+
+    public void RefreshDock() => _dockWindow?.RefreshItems();
+
+    private void OpenDashboard()
+    {
+        _mainWindow?.Activate();
     }
 }
