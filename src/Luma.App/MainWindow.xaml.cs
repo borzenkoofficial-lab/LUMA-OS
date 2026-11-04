@@ -3,6 +3,8 @@ using Luma.App.Services;
 using Luma.Core.Navigation;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media.Imaging;
+using Windows.Storage.Pickers;
 
 namespace Luma.App;
 
@@ -11,6 +13,7 @@ public sealed partial class MainWindow : Window
     private readonly ShellNavigationState _navigation = new();
     private readonly AppCatalogService _appCatalog = new();
     private readonly DockService _dockService = new();
+    private readonly DesktopPreferencesService _desktopPreferences = new();
     private readonly ObservableCollection<AppShortcut> _visibleApps = new();
     private readonly ObservableCollection<AppShortcut> _pinnedApps = new();
     private readonly ObservableCollection<AppShortcut> _spotlightApps = new();
@@ -28,6 +31,7 @@ public sealed partial class MainWindow : Window
             _pinnedApps.Add(app);
 
         UpdateDockEmptyState();
+        RestoreWallpaper();
     }
 
     private void Navigate(ShellSection section, string eyebrow, string heading, string description)
@@ -38,8 +42,10 @@ public sealed partial class MainWindow : Window
         DescriptionText.Text = description;
 
         var showApplications = section == ShellSection.Applications;
-        OverviewPanel.Visibility = showApplications ? Visibility.Collapsed : Visibility.Visible;
+        var showDesktop = section == ShellSection.Desktop;
+        OverviewPanel.Visibility = showApplications || showDesktop ? Visibility.Collapsed : Visibility.Visible;
         ApplicationsPanel.Visibility = showApplications ? Visibility.Visible : Visibility.Collapsed;
+        DesktopPanel.Visibility = showDesktop ? Visibility.Visible : Visibility.Collapsed;
 
         if (showApplications && _allApps.Count == 0)
             RefreshApplications();
@@ -179,6 +185,63 @@ public sealed partial class MainWindow : Window
             report($"Could not launch {app.Name}: {ex.Message}");
         }
     }
+
+    private void RestoreWallpaper()
+    {
+        var path = _desktopPreferences.LoadWallpaperPath();
+        if (path is null)
+        {
+            WallpaperStatusText.Text = "No custom wallpaper selected.";
+            return;
+        }
+
+        try
+        {
+            WorkspaceWallpaper.Source = new BitmapImage(new Uri(path));
+            WallpaperStatusText.Text = $"Current wallpaper: {Path.GetFileName(path)}";
+        }
+        catch (Exception ex)
+        {
+            WallpaperStatusText.Text = $"Saved wallpaper could not be displayed: {ex.Message}";
+        }
+    }
+
+    private async void ChooseWallpaper_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var picker = new FileOpenPicker();
+            picker.SuggestedStartLocation = PickerLocationId.PicturesLibrary;
+            picker.FileTypeFilter.Add(".png");
+            picker.FileTypeFilter.Add(".jpg");
+            picker.FileTypeFilter.Add(".jpeg");
+            picker.FileTypeFilter.Add(".bmp");
+
+            var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
+            WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
+            var file = await picker.PickSingleFileAsync();
+            if (file is null)
+                return;
+
+            _desktopPreferences.SaveWallpaperPath(file.Path);
+            WorkspaceWallpaper.Source = new BitmapImage(new Uri(file.Path));
+            WallpaperStatusText.Text = $"Current wallpaper: {file.Name}";
+        }
+        catch (Exception ex)
+        {
+            WallpaperStatusText.Text = $"Could not set wallpaper: {ex.Message}";
+        }
+    }
+
+    private void RemoveWallpaper_Click(object sender, RoutedEventArgs e)
+    {
+        WorkspaceWallpaper.Source = null;
+        WallpaperStatusText.Text = "Wallpaper preview cleared. The saved file remains unchanged until a new image is selected.";
+    }
+
+    private void Desktop_Click(object sender, RoutedEventArgs e) =>
+        Navigate(ShellSection.Desktop, "PERSONAL WORKSPACE", "Your desktop, your atmosphere.",
+            "A configurable LUMA workspace preview. Wallpaper changes are stored locally and do not modify Windows settings.");
 
     private void AppSearch_TextChanged(object sender, TextChangedEventArgs e) => ApplyAppFilter();
     private void SpotlightSearch_TextChanged(object sender, TextChangedEventArgs e) => RefreshSpotlightResults();
