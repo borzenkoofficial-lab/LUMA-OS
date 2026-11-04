@@ -6,6 +6,7 @@ public partial class App : Application
 {
     private MainWindow? _mainWindow;
     private DockWindow? _dockWindow;
+    private LaunchpadWindow? _launchpadWindow;
 
     public App()
     {
@@ -17,7 +18,7 @@ public partial class App : Application
         _mainWindow = new MainWindow();
         _mainWindow.Activate();
 
-        _dockWindow = new DockWindow(OpenDashboard);
+        _dockWindow = new DockWindow(OpenDashboard, OpenLaunchpad);
         _dockWindow.Activate();
     }
 
@@ -26,5 +27,18 @@ public partial class App : Application
     private void OpenDashboard()
     {
         _mainWindow?.Activate();
+    }
+
+    private void OpenLaunchpad()
+    {
+        if (_launchpadWindow is not null)
+        {
+            _launchpadWindow.Activate();
+            return;
+        }
+
+        _launchpadWindow = new LaunchpadWindow();
+        _launchpadWindow.Closed += (_, _) => _launchpadWindow = null;
+        _launchpadWindow.Activate();
     }
 }
