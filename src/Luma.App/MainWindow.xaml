@@ -112,7 +112,7 @@
                 <TextBlock Text="SAFE MODE  /  EXPLORER UNTOUCHED" Foreground="#7ED6B1" FontSize="10" CharacterSpacing="80" HorizontalAlignment="Right" VerticalAlignment="Center"/>
             </Grid>
         </Border>
-        <Grid x:Name="SpotlightOverlay" Grid.RowSpan="4" Background="#B8101116" Visibility="Collapsed" IsTabStop="True">
+        <Grid x:Name="SpotlightOverlay" Grid.RowSpan="4" Background="#B8101116" Visibility="Collapsed">
             <Border Width="560" MaxHeight="520" VerticalAlignment="Top" Margin="0,90,0,0" Background="#202330" CornerRadius="22" Padding="20">
                 <StackPanel Spacing="14">
                     <Grid>
