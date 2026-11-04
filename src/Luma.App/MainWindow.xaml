@@ -8,9 +8,10 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Grid Grid.Row="0" Padding="28,22,28,14">
-            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
             <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
                 <Border Width="34" Height="34" CornerRadius="11" Background="#D9E4FF">
                     <TextBlock Text="L" Foreground="#171923" FontSize="21" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
@@ -20,7 +21,8 @@
                     <TextBlock Text="WINDOWS EXPERIENCE" Foreground="#858A9B" FontSize="9" CharacterSpacing="110"/>
                 </StackPanel>
             </StackPanel>
-            <TextBlock Grid.Column="1" Text="FOUNDATION PREVIEW" Foreground="#858A9B" FontSize="10" CharacterSpacing="120" VerticalAlignment="Center"/>
+            <Button Grid.Column="1" Content="⌕  Search" Margin="0,0,14,0" Click="Spotlight_Click"/>
+            <TextBlock Grid.Column="2" Text="FOUNDATION PREVIEW" Foreground="#858A9B" FontSize="10" CharacterSpacing="120" VerticalAlignment="Center"/>
         </Grid>
         <Grid Grid.Row="1" Padding="28,24">
             <Grid.ColumnDefinitions><ColumnDefinition Width="210"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
@@ -40,31 +42,31 @@
             <ScrollViewer Grid.Column="1" Padding="28,8,8,8">
                 <StackPanel Spacing="22">
                     <StackPanel x:Name="OverviewPanel" Spacing="22">
-                    <StackPanel Spacing="8">
-                        <TextBlock x:Name="EyebrowText" Text="YOUR WINDOWS, REIMAGINED" Foreground="#9DA8C8" FontSize="11" CharacterSpacing="160"/>
-                        <TextBlock x:Name="HeadingText" Text="A calmer way to work." Foreground="#F5F6FA" FontSize="38" FontWeight="SemiBold" TextWrapping="Wrap"/>
-                        <TextBlock x:Name="DescriptionText" Text="LUMA is the foundation for a more coherent Windows desktop. This preview establishes the native shell host and its core navigation." Foreground="#A8ADBC" FontSize="15" MaxWidth="720" TextWrapping="Wrap" LineHeight="24"/>
-                    </StackPanel>
-                    <Grid ColumnSpacing="14">
-                        <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                        <Border Grid.Column="0" Background="#1B1E29" CornerRadius="18" Padding="18">
-                            <StackPanel Spacing="8"><TextBlock Text="01" Foreground="#9DA8C8" FontSize="12"/><TextBlock Text="Desktop" Foreground="#F5F6FA" FontSize="18" FontWeight="SemiBold"/><TextBlock Text="Surface and workspace layer" Foreground="#9298AA" FontSize="12" TextWrapping="Wrap"/></StackPanel>
-                        </Border>
-                        <Border Grid.Column="1" Background="#1B1E29" CornerRadius="18" Padding="18">
-                            <StackPanel Spacing="8"><TextBlock Text="02" Foreground="#9DA8C8" FontSize="12"/><TextBlock Text="Dock" Foreground="#F5F6FA" FontSize="18" FontWeight="SemiBold"/><TextBlock Text="Pinned and active apps" Foreground="#9298AA" FontSize="12" TextWrapping="Wrap"/></StackPanel>
-                        </Border>
-                        <Border Grid.Column="2" Background="#1B1E29" CornerRadius="18" Padding="18">
-                            <StackPanel Spacing="8"><TextBlock Text="03" Foreground="#9DA8C8" FontSize="12"/><TextBlock Text="Spotlight" Foreground="#F5F6FA" FontSize="18" FontWeight="SemiBold"/><TextBlock Text="Search and quick actions" Foreground="#9298AA" FontSize="12" TextWrapping="Wrap"/></StackPanel>
-                        </Border>
-                    </Grid>
-                    <Border Background="#202330" CornerRadius="18" Padding="20">
                         <StackPanel Spacing="8">
-                            <TextBlock Text="FOUNDATION MILESTONE" Foreground="#9DA8C8" FontSize="10" CharacterSpacing="140"/>
-                            <TextBlock Text="Native shell host initialized" Foreground="#F5F6FA" FontSize="18" FontWeight="SemiBold"/>
-                            <TextBlock Text="The current build is an application preview. It does not replace Explorer, alter system startup, or take ownership of the Windows desktop." Foreground="#A8ADBC" FontSize="13" TextWrapping="Wrap" LineHeight="21"/>
+                            <TextBlock x:Name="EyebrowText" Text="YOUR WINDOWS, REIMAGINED" Foreground="#9DA8C8" FontSize="11" CharacterSpacing="160"/>
+                            <TextBlock x:Name="HeadingText" Text="A calmer way to work." Foreground="#F5F6FA" FontSize="38" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                            <TextBlock x:Name="DescriptionText" Text="LUMA is the foundation for a more coherent Windows desktop. This preview establishes the native shell host and its core navigation." Foreground="#A8ADBC" FontSize="15" MaxWidth="720" TextWrapping="Wrap" LineHeight="24"/>
                         </StackPanel>
-                    </Border>
-                </StackPanel>
+                        <Grid ColumnSpacing="14">
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                            <Border Grid.Column="0" Background="#1B1E29" CornerRadius="18" Padding="18">
+                                <StackPanel Spacing="8"><TextBlock Text="01" Foreground="#9DA8C8" FontSize="12"/><TextBlock Text="Desktop" Foreground="#F5F6FA" FontSize="18" FontWeight="SemiBold"/><TextBlock Text="Surface and workspace layer" Foreground="#9298AA" FontSize="12" TextWrapping="Wrap"/></StackPanel>
+                            </Border>
+                            <Border Grid.Column="1" Background="#1B1E29" CornerRadius="18" Padding="18">
+                                <StackPanel Spacing="8"><TextBlock Text="02" Foreground="#9DA8C8" FontSize="12"/><TextBlock Text="Dock" Foreground="#F5F6FA" FontSize="18" FontWeight="SemiBold"/><TextBlock Text="Pinned and active apps" Foreground="#9298AA" FontSize="12" TextWrapping="Wrap"/></StackPanel>
+                            </Border>
+                            <Border Grid.Column="2" Background="#1B1E29" CornerRadius="18" Padding="18">
+                                <StackPanel Spacing="8"><TextBlock Text="03" Foreground="#9DA8C8" FontSize="12"/><TextBlock Text="Spotlight" Foreground="#F5F6FA" FontSize="18" FontWeight="SemiBold"/><TextBlock Text="Search and quick actions" Foreground="#9298AA" FontSize="12" TextWrapping="Wrap"/></StackPanel>
+                            </Border>
+                        </Grid>
+                        <Border Background="#202330" CornerRadius="18" Padding="20">
+                            <StackPanel Spacing="8">
+                                <TextBlock Text="FOUNDATION MILESTONE" Foreground="#9DA8C8" FontSize="10" CharacterSpacing="140"/>
+                                <TextBlock Text="Native shell host initialized" Foreground="#F5F6FA" FontSize="18" FontWeight="SemiBold"/>
+                                <TextBlock Text="The current build is an application preview. It does not replace Explorer, alter system startup, or take ownership of the Windows desktop." Foreground="#A8ADBC" FontSize="13" TextWrapping="Wrap" LineHeight="21"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
                     <StackPanel x:Name="ApplicationsPanel" Visibility="Collapsed" Spacing="14">
                         <Grid ColumnSpacing="10">
                             <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
@@ -75,10 +77,11 @@
                         <ListView x:Name="AppsList" Height="460" SelectionMode="None">
                             <ListView.ItemTemplate>
                                 <DataTemplate>
-                                    <Grid Padding="10" ColumnSpacing="12">
-                                        <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                    <Grid Padding="10" ColumnSpacing="10">
+                                        <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                                         <TextBlock Text="{Binding Name}" Foreground="#F5F6FA" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
-                                        <Button Grid.Column="1" Content="Open" Tag="{Binding ShortcutPath}" Click="LaunchApp_Click"/>
+                                        <Button Grid.Column="1" Content="Pin" Tag="{Binding ShortcutPath}" Click="PinApp_Click"/>
+                                        <Button Grid.Column="2" Content="Open" Tag="{Binding ShortcutPath}" Click="LaunchApp_Click"/>
                                     </Grid>
                                 </DataTemplate>
                             </ListView.ItemTemplate>
@@ -87,11 +90,51 @@
                 </StackPanel>
             </ScrollViewer>
         </Grid>
-        <Border Grid.Row="2" Background="#191B24" Padding="20,12">
+        <Border Grid.Row="2" Background="#191B24" CornerRadius="18" Margin="28,0,28,12" Padding="12,8">
+            <StackPanel Spacing="6">
+                <TextBlock Text="DOCK" Foreground="#858A9B" FontSize="9" CharacterSpacing="130" HorizontalAlignment="Center"/>
+                <ItemsControl x:Name="DockItemsControl">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate><StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="8"/></ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Button Content="{Binding Name}" Tag="{Binding ShortcutPath}" Click="DockApp_Click" MinWidth="76" MaxWidth="150"/>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <TextBlock x:Name="DockEmptyText" Text="Pin applications from the Applications section" Foreground="#777D8F" FontSize="10" HorizontalAlignment="Center"/>
+            </StackPanel>
+        </Border>
+        <Border Grid.Row="3" Background="#191B24" Padding="20,10">
             <Grid>
                 <TextBlock Text="LUMA • FOUNDATION" Foreground="#858A9B" FontSize="10" CharacterSpacing="100" VerticalAlignment="Center"/>
                 <TextBlock Text="SAFE MODE  /  EXPLORER UNTOUCHED" Foreground="#7ED6B1" FontSize="10" CharacterSpacing="80" HorizontalAlignment="Right" VerticalAlignment="Center"/>
             </Grid>
         </Border>
+        <Grid x:Name="SpotlightOverlay" Grid.RowSpan="4" Background="#B8101116" Visibility="Collapsed" IsTabStop="True">
+            <Border Width="560" MaxHeight="520" VerticalAlignment="Top" Margin="0,90,0,0" Background="#202330" CornerRadius="22" Padding="20">
+                <StackPanel Spacing="14">
+                    <Grid>
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                        <TextBlock Text="SPOTLIGHT" Foreground="#9DA8C8" FontSize="10" CharacterSpacing="150" VerticalAlignment="Center"/>
+                        <Button Grid.Column="1" Content="Close  Esc" Click="CloseSpotlight_Click"/>
+                    </Grid>
+                    <TextBox x:Name="SpotlightSearchBox" PlaceholderText="Search applications..." TextChanged="SpotlightSearch_TextChanged"/>
+                    <TextBlock x:Name="SpotlightStatusText" Text="Search your Start Menu applications" Foreground="#9298AA" FontSize="11"/>
+                    <ListView x:Name="SpotlightResults" MaxHeight="360" SelectionMode="None">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Padding="8" ColumnSpacing="12">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                    <TextBlock Text="{Binding Name}" Foreground="#F5F6FA" VerticalAlignment="Center"/>
+                                    <Button Grid.Column="1" Content="Open" Tag="{Binding ShortcutPath}" Click="SpotlightLaunch_Click"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </StackPanel>
+            </Border>
+        </Grid>
     </Grid>
 </Window>
