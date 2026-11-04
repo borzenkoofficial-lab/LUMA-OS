@@ -15,6 +15,7 @@ public sealed partial class MainWindow : Window
     private readonly ObservableCollection<AppShortcut> _pinnedApps = new();
     private readonly ObservableCollection<AppShortcut> _spotlightApps = new();
     private IReadOnlyList<AppShortcut> _allApps = Array.Empty<AppShortcut>();
+    private bool _updatingCategories;
 
     public MainWindow()
     {
@@ -49,6 +50,7 @@ public sealed partial class MainWindow : Window
         try
         {
             _allApps = _appCatalog.Discover();
+            UpdateCategoryFilter();
             ApplyAppFilter();
             AppsStatusText.Text = _allApps.Count == 0
                 ? "No Start Menu shortcuts found. Packaged apps without shortcuts are not listed yet."
@@ -64,9 +66,11 @@ public sealed partial class MainWindow : Window
     private void ApplyAppFilter()
     {
         var query = AppSearchBox.Text?.Trim() ?? string.Empty;
-        var matches = string.IsNullOrEmpty(query)
-            ? _allApps
-            : _allApps.Where(app => app.Name.Contains(query, StringComparison.CurrentCultureIgnoreCase)).ToArray();
+        var selectedCategory = AppCategoryFilter.SelectedItem as string;
+        var matches = _allApps.Where(app =>
+                (string.IsNullOrEmpty(query) || app.Name.Contains(query, StringComparison.CurrentCultureIgnoreCase)) &&
+                (string.IsNullOrEmpty(selectedCategory) || selectedCategory == "All categories" || app.Category == selectedCategory))
+            .ToArray();
 
         _visibleApps.Clear();
         foreach (var app in matches)
@@ -76,7 +80,7 @@ public sealed partial class MainWindow : Window
             AppsStatusText.Text = $"{_visibleApps.Count} of {_allApps.Count} applications";
     }
 
-    private void RefreshSpotlightResults()
+    private void UpdateCategoryFilter()\n    {\n        _updatingCategories = true;\n        var selected = AppCategoryFilter.SelectedItem as string;\n        AppCategoryFilter.Items.Clear();\n        AppCategoryFilter.Items.Add("All categories");\n        foreach (var category in _allApps.Select(app => app.Category).Distinct(StringComparer.CurrentCultureIgnoreCase).OrderBy(value => value))\n            AppCategoryFilter.Items.Add(category);\n        AppCategoryFilter.SelectedItem = selected is not null && AppCategoryFilter.Items.Contains(selected) ? selected : "All categories";\n        _updatingCategories = false;\n    }\n\n    private void AppCategory_SelectionChanged(object sender, SelectionChangedEventArgs e)\n    {\n        if (!_updatingCategories) ApplyAppFilter();\n    }\n\n    private void UnpinDockApp_Click(object sender, RoutedEventArgs e)\n    {\n        if (sender is not Button { Tag: string path }) return;\n        var pinned = _pinnedApps.FirstOrDefault(app => string.Equals(app.ShortcutPath, path, StringComparison.OrdinalIgnoreCase));\n        if (pinned is null) return;\n        _pinnedApps.Remove(pinned);\n        PersistDock();\n    }\n\n    private void RefreshSpotlightResults()
     {
         var query = SpotlightSearchBox.Text?.Trim() ?? string.Empty;
         var matches = string.IsNullOrWhiteSpace(query)
