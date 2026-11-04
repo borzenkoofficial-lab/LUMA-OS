@@ -16,8 +16,9 @@ public partial class App : Application
     protected override void OnLaunched(LaunchActivatedEventArgs args)
     {
         _mainWindow = new MainWindow();
-        _mainWindow.Activate();
 
+        // Keep the Windows desktop visible on startup. The dashboard opens only
+        // when the user selects the LUMA control in the Dock.
         _dockWindow = new DockWindow(OpenDashboard, OpenLaunchpad);
         _dockWindow.Activate();
     }
