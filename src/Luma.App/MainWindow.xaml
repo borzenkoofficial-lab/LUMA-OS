@@ -24,12 +24,14 @@
             <Button Grid.Column="1" Content="⌕  Search" Margin="0,0,14,0" Click="Spotlight_Click"/>
             <TextBlock Grid.Column="2" Text="FOUNDATION PREVIEW" Foreground="#858A9B" FontSize="10" CharacterSpacing="120" VerticalAlignment="Center"/>
         </Grid>
-        <Grid Grid.Row="1" Padding="28,24">
+        <Grid x:Name="WorkspaceRoot" Grid.Row="1" Padding="28,24">
+            <Image x:Name="WorkspaceWallpaper" Stretch="UniformToFill" Opacity="0.32" IsHitTestVisible="False"/>
             <Grid.ColumnDefinitions><ColumnDefinition Width="210"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
             <Border Grid.Column="0" Background="#191B24" CornerRadius="22" Padding="12">
                 <StackPanel Spacing="8">
                     <TextBlock Text="WORKSPACE" Foreground="#74798B" FontSize="10" CharacterSpacing="130" Margin="10,8,0,10"/>
                     <Button Content="⌂   Overview" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Click="Home_Click"/>
+                    <Button Content="▤   Desktop" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Click="Desktop_Click"/>
                     <Button Content="▦   Applications" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Click="Applications_Click"/>
                     <Button Content="◈   Widgets" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Click="Widgets_Click"/>
                     <Button Content="⚙   Settings" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Click="Settings_Click"/>
@@ -41,6 +43,31 @@
             </Border>
             <ScrollViewer Grid.Column="1" Padding="28,8,8,8">
                 <StackPanel Spacing="22">
+                    <StackPanel x:Name="DesktopPanel" Visibility="Collapsed" Spacing="18">
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="PERSONAL WORKSPACE" Foreground="#9DA8C8" FontSize="11" CharacterSpacing="160"/>
+                            <TextBlock Text="Your desktop, your atmosphere." Foreground="#F5F6FA" FontSize="34" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                            <TextBlock Text="Choose a wallpaper for the LUMA workspace preview. Your selection is saved locally and restored the next time LUMA starts." Foreground="#A8ADBC" FontSize="14" MaxWidth="680" TextWrapping="Wrap" LineHeight="22"/>
+                        </StackPanel>
+                        <Border Background="#202330" CornerRadius="18" Padding="20">
+                            <StackPanel Spacing="12">
+                                <TextBlock Text="WALLPAPER" Foreground="#9DA8C8" FontSize="10" CharacterSpacing="140"/>
+                                <TextBlock x:Name="WallpaperStatusText" Text="No custom wallpaper selected." Foreground="#A8ADBC" FontSize="13" TextWrapping="Wrap"/>
+                                <StackPanel Orientation="Horizontal" Spacing="10">
+                                    <Button Content="Choose image" Click="ChooseWallpaper_Click"/>
+                                    <Button Content="Remove wallpaper" Click="RemoveWallpaper_Click"/>
+                                </StackPanel>
+                                <TextBlock Text="Supported formats: PNG, JPG, JPEG, BMP. This changes only the LUMA preview, not the Windows system wallpaper." Foreground="#858A9B" FontSize="11" TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Background="#1B1E29" CornerRadius="18" Padding="18">
+                            <StackPanel Spacing="6">
+                                <TextBlock Text="DESKTOP LAYER" Foreground="#9DA8C8" FontSize="10" CharacterSpacing="130"/>
+                                <TextBlock Text="Workspace preview is active" Foreground="#F5F6FA" FontSize="17" FontWeight="SemiBold"/>
+                                <TextBlock Text="Native desktop icons, drag-and-drop placement, context menus, and live window integration will be added in subsequent milestones." Foreground="#A8ADBC" FontSize="12" TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
                     <StackPanel x:Name="OverviewPanel" Spacing="22">
                         <StackPanel Spacing="8">
                             <TextBlock x:Name="EyebrowText" Text="YOUR WINDOWS, REIMAGINED" Foreground="#9DA8C8" FontSize="11" CharacterSpacing="160"/>
