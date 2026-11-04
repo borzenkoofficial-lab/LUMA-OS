@@ -277,6 +277,34 @@ public sealed partial class MainWindow : Window
             LaunchShortcut(path, message => DesktopShortcutsStatus.Text = message);
     }
 
+    private void DesktopShortcutMenuOpen_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is MenuFlyoutItem { Tag: string path })
+            LaunchShortcut(path, message => DesktopShortcutsStatus.Text = message);
+    }
+
+    private void DesktopShortcutReveal_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is not MenuFlyoutItem { Tag: string path } || !File.Exists(path))
+        {
+            DesktopShortcutsStatus.Text = "Shortcut no longer exists.";
+            return;
+        }
+
+        try
+        {
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("explorer.exe", $"/select,\"{path}\"")
+            {
+                UseShellExecute = true
+            });
+            DesktopShortcutsStatus.Text = $"Showing {Path.GetFileName(path)} in File Explorer.";
+        }
+        catch (Exception ex)
+        {
+            DesktopShortcutsStatus.Text = $"Could not open File Explorer: {ex.Message}";
+        }
+    }
+
     private void Desktop_Click(object sender, RoutedEventArgs e) =>
         Navigate(ShellSection.Desktop, "PERSONAL WORKSPACE", "Your desktop, your atmosphere.",
             "A configurable LUMA workspace preview. Wallpaper changes are stored locally and do not modify Windows settings.");
