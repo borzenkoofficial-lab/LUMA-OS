@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using Luma.App.Services;
+using Luma.Core.Desktop;
 using Luma.Core.Navigation;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -14,6 +15,8 @@ public sealed partial class MainWindow : Window
     private readonly AppCatalogService _appCatalog = new();
     private readonly DockService _dockService = new();
     private readonly DesktopPreferencesService _desktopPreferences = new();
+    private readonly DesktopLayoutService _desktopLayoutService = new();
+    private readonly DesktopIconLayoutState _desktopLayout = new();
     private readonly ObservableCollection<AppShortcut> _desktopApps = new();
     private readonly ObservableCollection<AppShortcut> _visibleApps = new();
     private readonly ObservableCollection<AppShortcut> _pinnedApps = new();
@@ -34,6 +37,7 @@ public sealed partial class MainWindow : Window
 
         UpdateDockEmptyState();
         RestoreWallpaper();
+        _desktopLayout.Restore(_desktopLayoutService.Load());
     }
 
     private void Navigate(ShellSection section, string eyebrow, string heading, string description)
@@ -60,12 +64,12 @@ public sealed partial class MainWindow : Window
         try
         {
             var shortcuts = _appCatalog.DiscoverDesktopShortcuts();
-            _desktopApps.Clear();
-            foreach (var shortcut in shortcuts)
-                _desktopApps.Add(shortcut);
+            _desktopLayout.Synchronize(shortcuts.Select(item => item.ShortcutPath));
+            ApplyDesktopLayout(shortcuts);
+            _desktopLayoutService.Save(_desktopLayout.OrderedPaths);
             DesktopShortcutsStatus.Text = shortcuts.Count == 0
                 ? "No desktop shortcuts found."
-                : $"{shortcuts.Count} desktop shortcuts available.";
+                : $"{shortcuts.Count} desktop shortcuts • order saved locally.";
         }
         catch (Exception ex)
         {
@@ -268,6 +272,48 @@ public sealed partial class MainWindow : Window
             WallpaperStatusText.Text = $"Could not remove wallpaper preference: {ex.Message}";
         }
     }
+
+    private void ApplyDesktopLayout(IReadOnlyList<AppShortcut> discovered)
+    {
+        var byPath = discovered.ToDictionary(item => item.ShortcutPath, StringComparer.OrdinalIgnoreCase);
+        _desktopApps.Clear();
+        foreach (var path in _desktopLayout.OrderedPaths)
+        {
+            if (byPath.TryGetValue(path, out var shortcut))
+                _desktopApps.Add(shortcut);
+        }
+    }
+
+    private void MoveDesktopShortcut(object sender, int offset)
+    {
+        var path = sender switch
+        {
+            Button { Tag: string buttonPath } => buttonPath,
+            MenuFlyoutItem { Tag: string menuPath } => menuPath,
+            _ => null
+        };
+
+        if (path is null || !_desktopLayout.Move(path, offset))
+        {
+            DesktopShortcutsStatus.Text = "Shortcut is already at that edge or no longer exists.";
+            return;
+        }
+
+        try
+        {
+            _desktopLayoutService.Save(_desktopLayout.OrderedPaths);
+            var current = _desktopApps.ToArray();
+            ApplyDesktopLayout(current);
+            DesktopShortcutsStatus.Text = "Desktop icon order saved.";
+        }
+        catch (Exception ex)
+        {
+            DesktopShortcutsStatus.Text = $"Could not save desktop layout: {ex.Message}";
+        }
+    }
+
+    private void DesktopShortcutMoveUp_Click(object sender, RoutedEventArgs e) => MoveDesktopShortcut(sender, -1);
+    private void DesktopShortcutMoveDown_Click(object sender, RoutedEventArgs e) => MoveDesktopShortcut(sender, 1);
 
     private void RefreshDesktop_Click(object sender, RoutedEventArgs e) => RefreshDesktopShortcuts();
 
