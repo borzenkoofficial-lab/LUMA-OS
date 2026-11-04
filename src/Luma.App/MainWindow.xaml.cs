@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using Luma.App.Services;
 using Luma.Core.Desktop;
+using Luma.Core.Files;
 using Luma.Core.Navigation;
 using Luma.Core.Windows;
 using Microsoft.UI.Xaml;
@@ -15,6 +16,8 @@ public sealed partial class MainWindow : Window
     private readonly ShellNavigationState _navigation = new();
     private readonly AppCatalogService _appCatalog = new();
     private readonly WindowManagerService _windowManager = new();
+    private readonly FileBrowserService _fileBrowser = new();
+    private readonly FileBrowserPathState _fileBrowserPath = new();
     private readonly DockService _dockService = new();
     private readonly DesktopPreferencesService _desktopPreferences = new();
     private readonly DesktopLayoutService _desktopLayoutService = new();
@@ -24,6 +27,7 @@ public sealed partial class MainWindow : Window
     private readonly ObservableCollection<AppShortcut> _pinnedApps = new();
     private readonly ObservableCollection<AppShortcut> _spotlightApps = new();
     private readonly ObservableCollection<ManagedWindow> _managedWindows = new();
+    private readonly ObservableCollection<FileSystemEntry> _fileEntries = new();
     private IReadOnlyList<AppShortcut> _allApps = Array.Empty<AppShortcut>();
     private bool _updatingCategories;
 
@@ -35,6 +39,7 @@ public sealed partial class MainWindow : Window
         DockItemsControl.ItemsSource = _pinnedApps;
         SpotlightResults.ItemsSource = _spotlightApps;
         WindowItemsList.ItemsSource = _managedWindows;
+        FileEntriesList.ItemsSource = _fileEntries;
 
         foreach (var app in _dockService.Load())
             _pinnedApps.Add(app);
@@ -54,10 +59,12 @@ public sealed partial class MainWindow : Window
         var showApplications = section == ShellSection.Applications;
         var showDesktop = section == ShellSection.Desktop;
         var showWindows = section == ShellSection.Windows;
-        OverviewPanel.Visibility = showApplications || showDesktop || showWindows ? Visibility.Collapsed : Visibility.Visible;
+        var showFiles = section == ShellSection.Files;
+        OverviewPanel.Visibility = showApplications || showDesktop || showWindows || showFiles ? Visibility.Collapsed : Visibility.Visible;
         ApplicationsPanel.Visibility = showApplications ? Visibility.Visible : Visibility.Collapsed;
         DesktopPanel.Visibility = showDesktop ? Visibility.Visible : Visibility.Collapsed;
         WindowsPanel.Visibility = showWindows ? Visibility.Visible : Visibility.Collapsed;
+        FilesPanel.Visibility = showFiles ? Visibility.Visible : Visibility.Collapsed;
 
         if (showApplications && _allApps.Count == 0)
             RefreshApplications();
@@ -65,6 +72,8 @@ public sealed partial class MainWindow : Window
             RefreshDesktopShortcuts();
         if (showWindows)
             RefreshWindows();
+        if (showFiles && _fileBrowserPath.CurrentPath is null)
+            NavigateFileBrowser(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
     }
 
     private void RefreshDesktopShortcuts()
@@ -467,6 +476,94 @@ public sealed partial class MainWindow : Window
     }
 
     private void RefreshWindows_Click(object sender, RoutedEventArgs e) => RefreshWindows();
+
+    private void NavigateFileBrowser(string path)
+    {
+        if (!_fileBrowserPath.TryNavigate(path))
+        {
+            FileManagerStatus.Text = "The folder path is invalid.";
+            return;
+        }
+
+        try
+        {
+            var entries = _fileBrowser.Browse(_fileBrowserPath.CurrentPath!);
+            _fileEntries.Clear();
+            foreach (var entry in entries)
+                _fileEntries.Add(entry);
+
+            FilePathBox.Text = _fileBrowserPath.CurrentPath;
+            FileManagerStatus.Text = $"{entries.Count} items in this folder.";
+        }
+        catch (Exception ex)
+        {
+            FileManagerStatus.Text = $"Could not open folder: {ex.Message}";
+        }
+    }
+
+    private void NavigateFilePath_Click(object sender, RoutedEventArgs e) =>
+        NavigateFileBrowser(FilePathBox.Text);
+
+    private void FileParent_Click(object sender, RoutedEventArgs e)
+    {
+        if (_fileBrowserPath.ParentPath is { } parent)
+            NavigateFileBrowser(parent);
+        else
+            FileManagerStatus.Text = "This is the root of the current path.";
+    }
+
+    private async void ChooseFolder_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var picker = new FolderPicker();
+            picker.SuggestedStartLocation = PickerLocationId.ComputerFolder;
+            picker.FileTypeFilter.Add("*");
+            var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
+            WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
+            var folder = await picker.PickSingleFolderAsync();
+            if (folder is not null)
+                NavigateFileBrowser(folder.Path);
+        }
+        catch (Exception ex)
+        {
+            FileManagerStatus.Text = $"Could not choose a folder: {ex.Message}";
+        }
+    }
+
+    private void FileEntry_Open_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is not Button { Tag: string path })
+            return;
+
+        var entry = _fileEntries.FirstOrDefault(item =>
+            string.Equals(item.FullPath, path, StringComparison.OrdinalIgnoreCase));
+        if (entry is null)
+        {
+            FileManagerStatus.Text = "This item is no longer in the current folder.";
+            return;
+        }
+
+        if (entry.IsDirectory)
+        {
+            NavigateFileBrowser(entry.FullPath);
+            return;
+        }
+
+        try
+        {
+            _fileBrowser.OpenFile(entry);
+            FileManagerStatus.Text = $"Opened {entry.Name} with its default application.";
+        }
+        catch (Exception ex)
+        {
+            FileManagerStatus.Text = $"Could not open {entry.Name}: {ex.Message}";
+        }
+    }
+
+    private void Files_Click(object sender, RoutedEventArgs e) =>
+        Navigate(ShellSection.Files, "FILE MANAGER", "Your files. One calm workspace.",
+            "Browse folders and open files with Windows default applications. File operations are read-only in this milestone.");
 
     private void Windows_Click(object sender, RoutedEventArgs e) =>
         Navigate(ShellSection.Windows, "WINDOW MANAGER", "Every open window, under control.",
