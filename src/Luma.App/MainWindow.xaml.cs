@@ -14,6 +14,7 @@ public sealed partial class MainWindow : Window
     private readonly AppCatalogService _appCatalog = new();
     private readonly DockService _dockService = new();
     private readonly DesktopPreferencesService _desktopPreferences = new();
+    private readonly ObservableCollection<AppShortcut> _desktopApps = new();
     private readonly ObservableCollection<AppShortcut> _visibleApps = new();
     private readonly ObservableCollection<AppShortcut> _pinnedApps = new();
     private readonly ObservableCollection<AppShortcut> _spotlightApps = new();
@@ -24,6 +25,7 @@ public sealed partial class MainWindow : Window
     {
         InitializeComponent();
         AppsList.ItemsSource = _visibleApps;
+        DesktopItemsList.ItemsSource = _desktopApps;
         DockItemsControl.ItemsSource = _pinnedApps;
         SpotlightResults.ItemsSource = _spotlightApps;
 
@@ -49,6 +51,26 @@ public sealed partial class MainWindow : Window
 
         if (showApplications && _allApps.Count == 0)
             RefreshApplications();
+        if (showDesktop)
+            RefreshDesktopShortcuts();
+    }
+
+    private void RefreshDesktopShortcuts()
+    {
+        try
+        {
+            var shortcuts = _appCatalog.DiscoverDesktopShortcuts();
+            _desktopApps.Clear();
+            foreach (var shortcut in shortcuts)
+                _desktopApps.Add(shortcut);
+            DesktopShortcutsStatus.Text = shortcuts.Count == 0
+                ? "No desktop shortcuts found."
+                : $"{shortcuts.Count} desktop shortcuts available.";
+        }
+        catch (Exception ex)
+        {
+            DesktopShortcutsStatus.Text = $"Could not read desktop shortcuts: {ex.Message}";
+        }
     }
 
     private void RefreshApplications()
@@ -166,7 +188,7 @@ public sealed partial class MainWindow : Window
 
     private void LaunchShortcut(string shortcutPath, Action<string> report)
     {
-        var app = _allApps.Concat(_pinnedApps)
+        var app = _allApps.Concat(_pinnedApps).Concat(_desktopApps)
             .FirstOrDefault(item => string.Equals(item.ShortcutPath, shortcutPath, StringComparison.OrdinalIgnoreCase));
 
         if (app is null)
@@ -245,6 +267,14 @@ public sealed partial class MainWindow : Window
         {
             WallpaperStatusText.Text = $"Could not remove wallpaper preference: {ex.Message}";
         }
+    }
+
+    private void RefreshDesktop_Click(object sender, RoutedEventArgs e) => RefreshDesktopShortcuts();
+
+    private void DesktopShortcut_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button { Tag: string path })
+            LaunchShortcut(path, message => DesktopShortcutsStatus.Text = message);
     }
 
     private void Desktop_Click(object sender, RoutedEventArgs e) =>
