@@ -684,6 +684,12 @@ public sealed partial class MainWindow : Window
         RefreshSpotlightResults();
     }
 
+    public void ShowSpotlight()
+    {
+        Activate();
+        Spotlight_Click(this, new RoutedEventArgs());
+    }
+
     private void CloseSpotlight_Click(object sender, RoutedEventArgs e) =>
         SpotlightOverlay.Visibility = Visibility.Collapsed;
 
