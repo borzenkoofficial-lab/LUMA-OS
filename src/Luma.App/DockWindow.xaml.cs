@@ -41,6 +41,7 @@ public sealed partial class DockWindow : Window
         }
 
         EmptyDockText.Visibility = _items.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
+        PositionWindow();
     }
 
     private static async Task LoadIconAsync(DockItem item)
@@ -63,9 +64,19 @@ public sealed partial class DockWindow : Window
             presenter.IsAlwaysOnTop = true;
         }
 
-        const int width = 570;
-        const int height = 86;
+        PositionWindow();
+    }
+
+    private void PositionWindow()
+    {
+        var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
+        var windowId = Win32Interop.GetWindowIdFromWindow(hwnd);
+        var appWindow = AppWindow.GetFromWindowId(windowId);
         var workArea = DisplayArea.GetFromWindowId(windowId, DisplayAreaFallback.Primary).WorkArea;
+
+        const int height = 86;
+        var maximumWidth = Math.Max(300, workArea.Width - 32);
+        var width = Math.Min(maximumWidth, Math.Max(300, 190 + _items.Count * 72));
         var x = workArea.X + Math.Max(0, (workArea.Width - width) / 2);
         var y = workArea.Y + Math.Max(0, workArea.Height - height - 12);
         appWindow.MoveAndResize(new RectInt32(x, y, width, height));
