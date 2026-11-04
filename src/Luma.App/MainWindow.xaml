@@ -74,7 +74,14 @@
                                     </ListView.ItemsPanel>
                                     <ListView.ItemTemplate>
                                         <DataTemplate>
-                                            <Button Content="{Binding Name}" Tag="{Binding ShortcutPath}" Click="DesktopShortcut_Click" Width="150" Height="64" Margin="4"/>
+                                            <Button Content="{Binding Name}" Tag="{Binding ShortcutPath}" Click="DesktopShortcut_Click" Width="150" Height="64" Margin="4">
+                                                <Button.ContextFlyout>
+                                                    <MenuFlyout>
+                                                        <MenuFlyoutItem Text="Open" Tag="{Binding ShortcutPath}" Click="DesktopShortcutMenuOpen_Click"/>
+                                                        <MenuFlyoutItem Text="Show in File Explorer" Tag="{Binding ShortcutPath}" Click="DesktopShortcutReveal_Click"/>
+                                                    </MenuFlyout>
+                                                </Button.ContextFlyout>
+                                            </Button>
                                         </DataTemplate>
                                     </ListView.ItemTemplate>
                                 </ListView>
