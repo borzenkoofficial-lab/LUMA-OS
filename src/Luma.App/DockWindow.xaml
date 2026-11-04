@@ -5,12 +5,12 @@
     Title="LUMA Dock">
     <Grid Background="Transparent">
         <Border Background="#F01B1E29"
-                BorderBrush="#55FFFFFF"
+                BorderBrush="#66FFFFFF"
                 BorderThickness="1"
-                CornerRadius="25"
-                Padding="10,8"
+                CornerRadius="27"
+                Padding="12,9"
                 Margin="2">
-            <Grid ColumnSpacing="10">
+            <Grid ColumnSpacing="12">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
@@ -22,22 +22,22 @@
                         Background="#E8EAF4"
                         Foreground="#171923"
                         BorderThickness="0"
-                        CornerRadius="15"
+                        CornerRadius="17"
                         Padding="0"
-                        Width="54"
-                        Height="54"
+                        Width="58"
+                        Height="58"
                         VerticalAlignment="Center"
                         AutomationProperties.Name="Open LUMA">
                     <TextBlock Text="L"
-                               FontSize="29"
+                               FontSize="31"
                                FontWeight="Bold"
                                HorizontalAlignment="Center"
                                VerticalAlignment="Center"/>
                 </Button>
                 <Border Grid.Column="1"
                         Width="1"
-                        Height="42"
-                        Background="#35FFFFFF"
+                        Height="48"
+                        Background="#40FFFFFF"
                         VerticalAlignment="Center"
                         Margin="1,0"/>
                 <Grid Grid.Column="2">
@@ -47,11 +47,11 @@
                     </Grid.ColumnDefinitions>
                     <Button x:Name="LaunchpadButton" Grid.Column="0" Click="LaunchpadButton_Click"
                             Background="Transparent" BorderThickness="0" Padding="3,0"
-                            Width="62" Height="62" AutomationProperties.Name="Open Launchpad">
-                        <StackPanel Width="56" Spacing="3" HorizontalAlignment="Center">
-                            <Border Width="43" Height="43" CornerRadius="13"
-                                    Background="#35435B" BorderBrush="#45FFFFFF" BorderThickness="1">
-                                <Grid Padding="10">
+                            Width="72" Height="76" AutomationProperties.Name="Open Launchpad">
+                        <StackPanel Width="66" Spacing="3" HorizontalAlignment="Center">
+                            <Border Width="52" Height="52" CornerRadius="15"
+                                    Background="#35435B" BorderBrush="#55FFFFFF" BorderThickness="1">
+                                <Grid Padding="12">
                                     <Grid.RowDefinitions><RowDefinition/><RowDefinition/></Grid.RowDefinitions>
                                     <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
                                     <Ellipse Fill="#F2F4FA" Margin="1"/>
@@ -60,7 +60,7 @@
                                     <Ellipse Grid.Row="1" Grid.Column="1" Fill="#F2F4FA" Margin="1"/>
                                 </Grid>
                             </Border>
-                            <TextBlock Text="Apps" Foreground="#E9EBF2" FontSize="9"
+                            <TextBlock Text="Apps" Foreground="#E9EBF2" FontSize="10"
                                        HorizontalAlignment="Center"/>
                         </StackPanel>
                     </Button>
@@ -70,7 +70,7 @@
                                 <StackPanel Orientation="Horizontal"
                                             HorizontalAlignment="Center"
                                             VerticalAlignment="Center"
-                                            Spacing="5"/>
+                                            Spacing="6"/>
                             </ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
@@ -80,36 +80,36 @@
                                         Background="Transparent"
                                         BorderThickness="0"
                                         Padding="3,0"
-                                        MinWidth="60"
-                                        Height="62"
+                                        MinWidth="72"
+                                        Height="76"
                                         AutomationProperties.Name="{Binding Name}">
-                                    <StackPanel Width="66"
-                                                Spacing="3"
+                                    <StackPanel Width="72"
+                                                Spacing="4"
                                                 HorizontalAlignment="Center">
-                                        <Border Width="43"
-                                                Height="43"
-                                                CornerRadius="13"
+                                        <Border Width="52"
+                                                Height="52"
+                                                CornerRadius="15"
                                                 Background="#303747"
-                                                BorderBrush="#30FFFFFF"
+                                                BorderBrush="#40FFFFFF"
                                                 BorderThickness="1">
                                             <Grid>
                                                 <TextBlock Text="{Binding Initial}"
                                                            Foreground="#F4F5FA"
-                                                           FontSize="21"
+                                                           FontSize="23"
                                                            FontWeight="SemiBold"
                                                            HorizontalAlignment="Center"
                                                            VerticalAlignment="Center"/>
                                                 <Image Source="{Binding Icon}"
-                                                       Width="39" Height="39"
+                                                       Width="48" Height="48"
                                                        Stretch="Uniform"
                                                        HorizontalAlignment="Center"
                                                        VerticalAlignment="Center"/>
                                             </Grid>
                                         </Border>
                                         <TextBlock Text="{Binding Name}"
-                                                   Foreground="#E9EBF2"
-                                                   FontSize="9"
-                                                   MaxWidth="64"
+                                                   Foreground="#F1F2F7"
+                                                   FontSize="10"
+                                                   MaxWidth="70"
                                                    TextTrimming="CharacterEllipsis"
                                                    HorizontalAlignment="Center"/>
                                     </StackPanel>
@@ -119,7 +119,7 @@
                     </ItemsControl>
                     <TextBlock x:Name="EmptyDockText"
                                Text="Pin your favorite apps in LUMA"
-                               Foreground="#AEB4C4"
+                               Foreground="#B9C0D0"
                                FontSize="11"
                                HorizontalAlignment="Center"
                                VerticalAlignment="Center"
