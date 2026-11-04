@@ -1,9 +1,11 @@
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using Luma.App.Services;
 using Microsoft.UI;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Media;
 using Windows.Graphics;
 
 namespace Luma.App;
@@ -30,13 +32,20 @@ public sealed partial class DockWindow : Window
         _items.Clear();
         foreach (var app in _dockService.Load())
         {
-            _items.Add(new DockItem(
+            var item = new DockItem(
                 app.Name,
                 app.ShortcutPath,
-                string.IsNullOrWhiteSpace(app.Name) ? "•" : app.Name.Trim()[0].ToString().ToUpperInvariant()));
+                string.IsNullOrWhiteSpace(app.Name) ? "•" : app.Name.Trim()[0].ToString().ToUpperInvariant());
+            _items.Add(item);
+            _ = LoadIconAsync(item);
         }
 
         EmptyDockText.Visibility = _items.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
+    }
+
+    private static async Task LoadIconAsync(DockItem item)
+    {
+        item.Icon = await ShellIconService.LoadShortcutIconAsync(item.ShortcutPath);
     }
 
     private void ConfigureWindow()
@@ -87,5 +96,33 @@ public sealed partial class DockWindow : Window
         }
     }
 
-    private sealed record DockItem(string Name, string ShortcutPath, string Initial);
+    private sealed class DockItem : INotifyPropertyChanged
+    {
+        private ImageSource? _icon;
+
+        public DockItem(string name, string shortcutPath, string initial)
+        {
+            Name = name;
+            ShortcutPath = shortcutPath;
+            Initial = initial;
+        }
+
+        public string Name { get; }
+        public string ShortcutPath { get; }
+        public string Initial { get; }
+
+        public ImageSource? Icon
+        {
+            get => _icon;
+            set
+            {
+                if (ReferenceEquals(_icon, value))
+                    return;
+                _icon = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Icon)));
+            }
+        }
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+    }
 }
