@@ -66,7 +66,7 @@
                             <StackPanel Spacing="12">
                                 <Grid>
                                     <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-                                    <TextBlock Text="DESKTOP SHORTCUTS" Foreground="#9DA8C8" FontSize="10" CharacterSpacing="130" VerticalAlignment="Center"/>
+                                    <TextBlock Text="DESKTOP ITEMS" Foreground="#9DA8C8" FontSize="10" CharacterSpacing="130" VerticalAlignment="Center"/>
                                     <Button Grid.Column="1" Content="Refresh" Click="RefreshDesktop_Click"/>
                                 </Grid>
                                 <TextBlock x:Name="DesktopShortcutsStatus" Text="Loading desktop shortcuts..." Foreground="#A8ADBC" FontSize="12"/>
@@ -77,11 +77,11 @@
                                     <ListView.ItemTemplate>
                                         <DataTemplate>
                                             <StackPanel Width="164" Margin="4" Spacing="4">
-                                                <Button Content="{Binding Name}" Tag="{Binding ShortcutPath}" Click="DesktopShortcut_Click" Height="58">
+                                                <Button Content="{Binding Name}" Tag="{Binding FullPath}" Click="DesktopItem_Click" Height="58">
                                                     <Button.ContextFlyout>
                                                         <MenuFlyout>
-                                                            <MenuFlyoutItem Text="Open" Tag="{Binding ShortcutPath}" Click="DesktopShortcutMenuOpen_Click"/>
-                                                            <MenuFlyoutItem Text="Show in File Explorer" Tag="{Binding ShortcutPath}" Click="DesktopShortcutReveal_Click"/>
+                                                            <MenuFlyoutItem Text="Open" Tag="{Binding ShortcutPath}" Click="DesktopItemMenuOpen_Click"/>
+                                                            <MenuFlyoutItem Text="Show in File Explorer" Tag="{Binding ShortcutPath}" Click="DesktopItemReveal_Click"/>
                                                             <MenuFlyoutItem Text="Move left / up" Tag="{Binding ShortcutPath}" Click="DesktopShortcutMoveUp_Click"/>
                                                             <MenuFlyoutItem Text="Move right / down" Tag="{Binding ShortcutPath}" Click="DesktopShortcutMoveDown_Click"/>
                                                         </MenuFlyout>
@@ -95,7 +95,7 @@
                                         </DataTemplate>
                                     </ListView.ItemTemplate>
                                 </ListView>
-                                <TextBlock Text="Drag shortcuts to reorder them. LUMA saves the order locally. Only .lnk shortcuts are currently supported; native file and folder operations are still in development." Foreground="#858A9B" FontSize="11" TextWrapping="Wrap"/>
+                                <TextBlock Text="Drag desktop items to reorder them. Folders open inside LUMA File Manager; files and shortcuts open with Windows default handlers. Hidden and system entries are excluded." Foreground="#858A9B" FontSize="11" TextWrapping="Wrap"/>
                             </StackPanel>
                         </Border>
                         <Border Background="#1B1E29" CornerRadius="18" Padding="18">
