@@ -153,6 +153,7 @@ public sealed partial class MainWindow : Window
         if (pinned is null) return;
         _pinnedApps.Remove(pinned);
         PersistDock();
+        (Application.Current as App)?.RefreshDock();
     }
 
     private void RefreshSpotlightResults()
