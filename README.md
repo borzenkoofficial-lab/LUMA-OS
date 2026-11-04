@@ -14,6 +14,14 @@ LUMA is not a new operating system, a virtual machine, or a separate desktop tha
 - Keep Explorer and native Windows recovery available in the first release.
 - Add opt-in shell replacement only after safe mode, rollback, and crash recovery are proven.
 
+## Windows installer
+
+GitHub Actions builds a per-user Windows x64 installer (LUMA-OS-Setup.exe) and a portable preview ZIP. The installer targets Windows 10 version 1809 or later, installs under the current user's LocalAppData folder, and does not require administrator privileges.
+
+During setup, users can optionally create a desktop shortcut and enable launch at sign-in. Startup is opt-in and is removed by the uninstaller. Application settings are kept in the user's profile; uninstall does not intentionally remove personal settings.
+
+**This is an early preview installer.** It installs the current LUMA overlay application; it does not replace Explorer or the Windows taskbar, and it does not yet implement the full macOS-like desktop transformation. The installer is not code-signed, so Windows SmartScreen may show an unknown-publisher warning.
+
 ## First usable release
 
 - Native LUMA Dock for pinned and running Windows apps.
