@@ -9,6 +9,7 @@ public partial class App : Application
     private MenuBarWindow? _menuBarWindow;
     private LaunchpadWindow? _launchpadWindow;
     private ControlCenterWindow? _controlCenterWindow;
+    private FileManagerWindow? _fileManagerWindow;
 
     public App()
     {
@@ -25,7 +26,8 @@ public partial class App : Application
             OpenDashboard,
             OpenLaunchpad,
             OpenSpotlight,
-            OpenControlCenter);
+            OpenControlCenter,
+            OpenFileManager);
         _menuBarWindow.Activate();
 
         _dockWindow = new DockWindow(OpenDashboard, OpenLaunchpad);
@@ -62,5 +64,18 @@ public partial class App : Application
         _controlCenterWindow = new ControlCenterWindow();
         _controlCenterWindow.Closed += (_, _) => _controlCenterWindow = null;
         _controlCenterWindow.Activate();
+    }
+
+    private void OpenFileManager()
+    {
+        if (_fileManagerWindow is not null)
+        {
+            _fileManagerWindow.Activate();
+            return;
+        }
+
+        _fileManagerWindow = new FileManagerWindow();
+        _fileManagerWindow.Closed += (_, _) => _fileManagerWindow = null;
+        _fileManagerWindow.Activate();
     }
 }
