@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using Luma.App.Services;
 using Luma.Core.Desktop;
 using Luma.Core.Navigation;
+using Luma.Core.Windows;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Imaging;
@@ -434,6 +435,34 @@ public sealed partial class MainWindow : Window
         WindowManagerStatus.Text = _windowManager.RequestClose(handle)
             ? "A standard close request was sent. The application decides whether to save or cancel."
             : "Could not send a close request to this window.";
+        RefreshWindows();
+    }
+
+    private void SnapWindowLeft_Click(object sender, RoutedEventArgs e) =>
+        SnapWindow(sender, WindowSnapZone.LeftHalf);
+
+    private void SnapWindowRight_Click(object sender, RoutedEventArgs e) =>
+        SnapWindow(sender, WindowSnapZone.RightHalf);
+
+    private void SnapWindow(object sender, WindowSnapZone zone)
+    {
+        if (!TryGetWindowHandle(sender, out var handle))
+            return;
+
+        WindowManagerStatus.Text = _windowManager.Snap(handle, zone)
+            ? $"Window snapped to {zone} on its current monitor."
+            : "Could not position this window. It may have closed or Windows may have denied the operation.";
+        RefreshWindows();
+    }
+
+    private void MaximizeWindow_Click(object sender, RoutedEventArgs e)
+    {
+        if (!TryGetWindowHandle(sender, out var handle))
+            return;
+
+        WindowManagerStatus.Text = _windowManager.Maximize(handle)
+            ? "Window maximized."
+            : "The window is no longer available.";
         RefreshWindows();
     }
 
