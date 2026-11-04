@@ -64,7 +64,7 @@ jobs:
         shell: pwsh
         run: |
           choco install innosetup --no-progress -y
-          $compiler = "${env:ProgramFiles(x86)}Inno Setup 6ISCC.exe"
+          $compiler = Join-Path ${env:ProgramFiles(x86)} "Inno Setup 6\ISCC.exe"
           if (!(Test-Path $compiler)) {
             throw "Inno Setup compiler was not found at $compiler."
           }
@@ -73,9 +73,10 @@ jobs:
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path artifacts | Out-Null
-          $compiler = "${env:ProgramFiles(x86)}Inno Setup 6ISCC.exe"
+          $compiler = Join-Path ${env:ProgramFiles(x86)} "Inno Setup 6\ISCC.exe"
           $publishDir = (Resolve-Path "publish/win-x64").Path
-          & $compiler "/DPublishDir=$publishDir" "installer/LUMA-OS.iss"
+          $artifactsDir = (Resolve-Path "artifacts").Path
+          & $compiler "/O$artifactsDir" "/DPublishDir=$publishDir" "installer/LUMA-OS.iss"
           if ($LASTEXITCODE -ne 0) {
             throw "Inno Setup failed with exit code $LASTEXITCODE."
           }
