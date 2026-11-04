@@ -11,12 +11,14 @@ namespace Luma.App;
 public sealed partial class DockWindow : Window
 {
     private readonly Action _openDashboard;
+    private readonly Action _openLaunchpad;
     private readonly DockService _dockService = new();
     private readonly ObservableCollection<DockItem> _items = new();
 
-    public DockWindow(Action openDashboard)
+    public DockWindow(Action openDashboard, Action openLaunchpad)
     {
         _openDashboard = openDashboard;
+        _openLaunchpad = openLaunchpad;
         InitializeComponent();
         DockItems.ItemsSource = _items;
         ConfigureWindow();
@@ -61,6 +63,8 @@ public sealed partial class DockWindow : Window
     }
 
     private void LumaButton_Click(object sender, RoutedEventArgs e) => _openDashboard();
+
+    private void LaunchpadButton_Click(object sender, RoutedEventArgs e) => _openLaunchpad();
 
     private void LaunchApp_Click(object sender, RoutedEventArgs e)
     {
