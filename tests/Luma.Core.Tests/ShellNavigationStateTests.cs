@@ -16,6 +16,7 @@ public sealed class ShellNavigationStateTests
     [Theory]
     [InlineData(ShellSection.Applications)]
     [InlineData(ShellSection.Windows)]
+    [InlineData(ShellSection.Files)]
     [InlineData(ShellSection.Widgets)]
     [InlineData(ShellSection.Settings)]
     public void NavigatesToRequestedSection(ShellSection section)
