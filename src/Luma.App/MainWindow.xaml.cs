@@ -80,7 +80,33 @@ public sealed partial class MainWindow : Window
             AppsStatusText.Text = $"{_visibleApps.Count} of {_allApps.Count} applications";
     }
 
-    private void UpdateCategoryFilter()\n    {\n        _updatingCategories = true;\n        var selected = AppCategoryFilter.SelectedItem as string;\n        AppCategoryFilter.Items.Clear();\n        AppCategoryFilter.Items.Add("All categories");\n        foreach (var category in _allApps.Select(app => app.Category).Distinct(StringComparer.CurrentCultureIgnoreCase).OrderBy(value => value))\n            AppCategoryFilter.Items.Add(category);\n        AppCategoryFilter.SelectedItem = selected is not null && AppCategoryFilter.Items.Contains(selected) ? selected : "All categories";\n        _updatingCategories = false;\n    }\n\n    private void AppCategory_SelectionChanged(object sender, SelectionChangedEventArgs e)\n    {\n        if (!_updatingCategories) ApplyAppFilter();\n    }\n\n    private void UnpinDockApp_Click(object sender, RoutedEventArgs e)\n    {\n        if (sender is not Button { Tag: string path }) return;\n        var pinned = _pinnedApps.FirstOrDefault(app => string.Equals(app.ShortcutPath, path, StringComparison.OrdinalIgnoreCase));\n        if (pinned is null) return;\n        _pinnedApps.Remove(pinned);\n        PersistDock();\n    }\n\n    private void RefreshSpotlightResults()
+    private void UpdateCategoryFilter()
+    {
+        _updatingCategories = true;
+        var selected = AppCategoryFilter.SelectedItem as string;
+        AppCategoryFilter.Items.Clear();
+        AppCategoryFilter.Items.Add("All categories");
+        foreach (var category in _allApps.Select(app => app.Category).Distinct(StringComparer.CurrentCultureIgnoreCase).OrderBy(value => value))
+            AppCategoryFilter.Items.Add(category);
+        AppCategoryFilter.SelectedItem = selected is not null && AppCategoryFilter.Items.Contains(selected) ? selected : "All categories";
+        _updatingCategories = false;
+    }
+
+    private void AppCategory_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (!_updatingCategories) ApplyAppFilter();
+    }
+
+    private void UnpinDockApp_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is not Button { Tag: string path }) return;
+        var pinned = _pinnedApps.FirstOrDefault(app => string.Equals(app.ShortcutPath, path, StringComparison.OrdinalIgnoreCase));
+        if (pinned is null) return;
+        _pinnedApps.Remove(pinned);
+        PersistDock();
+    }
+
+    private void RefreshSpotlightResults()
     {
         var query = SpotlightSearchBox.Text?.Trim() ?? string.Empty;
         var matches = string.IsNullOrWhiteSpace(query)
